@@ -25,6 +25,11 @@ import {
   GestureHandlerRootView,
 } from "react-native-gesture-handler";
 import MapView, { Marker } from "react-native-maps";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 
 const GOOGLE_PLACES_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
 
@@ -33,6 +38,7 @@ const ITEM_HEIGHT = 80;
 export default function HomePage() {
   const flatListRef = useRef<FlatList>(null);
 
+  const [loading, setLoading] = useState(true);
   const [location, setLocation] = useState<LocationType>(null);
   const [coffeeShops, setCoffeeShops] = useState<Array<PlaceResult>>([]);
   const [filters, setFilters] = useState({
@@ -40,8 +46,12 @@ export default function HomePage() {
     distance: 2000,
     reviews: 20,
   });
-  const [loading, setLoading] = useState(true);
-  const [listHeight, setListHeight] = useState(300);
+
+  const listHeight = useSharedValue(300);
+  const startHeight = useSharedValue(300);
+  const animatedStyle = useAnimatedStyle(() => {
+    return { height: listHeight.value };
+  });
 
   const findNearbyCoffeeShops = useCallback(
     async (latitude: number, longitude: number) => {
@@ -209,28 +219,18 @@ export default function HomePage() {
     }, 100);
   };
 
-  const handleRatingChange = (item: { value: number }) => {
-    setFilters((f) => ({ ...f, rating: item.value }));
-    if (location) findNearbyCoffeeShops(location.latitude, location.longitude);
-  };
-
-  const handleDistanceChange = (item: { value: number }) => {
-    setFilters((f) => ({ ...f, distance: item.value }));
-    if (location) findNearbyCoffeeShops(location.latitude, location.longitude);
-  };
-
-  const handleReviewsChange = (item: { value: number }) => {
-    setFilters((f) => ({ ...f, reviews: item.value }));
-    if (location) findNearbyCoffeeShops(location.latitude, location.longitude);
-  };
-
-  const renderCoffeeShop = ({
-    item,
-    index,
+  const handleFilterChange = ({
+    key,
+    value,
   }: {
-    item: PlaceResult;
-    index: number;
+    key: string;
+    value: number;
   }) => {
+    setFilters((f) => ({ ...f, [key]: value }));
+    if (location) findNearbyCoffeeShops(location.latitude, location.longitude);
+  };
+
+  const renderCoffeeShop = ({ item }: { item: PlaceResult }) => {
     const distance = location
       ? calculateDistance(
           location.latitude,
@@ -264,16 +264,27 @@ export default function HomePage() {
   };
 
   const panGesture = Gesture.Pan()
+    .onBegin(() => {
+      startHeight.value = listHeight.value;
+    })
     .onUpdate((event) => {
-      const newHeight = Math.max(
+      listHeight.value = Math.max(
         100,
-        Math.min(500, listHeight - event.translationY)
+        Math.min(500, startHeight.value - event.translationY)
       );
-      setListHeight(newHeight);
     })
     .onEnd(() => {
-      const shouldCollapse = listHeight < 200;
-      setListHeight(shouldCollapse ? 100 : 300);
+      if (listHeight.value < 120) {
+        listHeight.value = withSpring(100, {
+          damping: 20,
+          stiffness: 200,
+        });
+      } else {
+        listHeight.value = withSpring(listHeight.value, {
+          damping: 20,
+          stiffness: 200,
+        });
+      }
     });
 
   if (loading) {
@@ -322,7 +333,9 @@ export default function HomePage() {
             valueField="value"
             placeholder="Rating"
             value={filters.rating}
-            onChange={handleRatingChange}
+            onChange={(v) =>
+              handleFilterChange({ key: "rating", value: v.value })
+            }
           />
           {/* Distance Filter */}
           <Dropdown
@@ -332,7 +345,9 @@ export default function HomePage() {
             valueField="value"
             placeholder="Distance"
             value={filters.distance}
-            onChange={handleDistanceChange}
+            onChange={(v) =>
+              handleFilterChange({ key: "distance", value: v.value })
+            }
           />
           {/* Reviews Filter */}
           <Dropdown
@@ -342,7 +357,9 @@ export default function HomePage() {
             valueField="value"
             placeholder="Reviews"
             value={filters.reviews}
-            onChange={handleReviewsChange}
+            onChange={(v) =>
+              handleFilterChange({ key: "reviews", value: v.value })
+            }
           />
         </View>
       </View>
@@ -374,7 +391,7 @@ export default function HomePage() {
         ))}
       </MapView>
 
-      <View style={[styles.draggableListContainer, { height: listHeight }]}>
+      <Animated.View style={[styles.draggableListContainer, animatedStyle]}>
         <GestureDetector gesture={panGesture}>
           <View style={styles.dragHandle}>
             <View style={styles.dragIndicator} />
@@ -393,7 +410,7 @@ export default function HomePage() {
           getItemLayout={getItemLayout}
           onScrollToIndexFailed={onScrollToIndexFailed}
         />
-      </View>
+      </Animated.View>
     </GestureHandlerRootView>
   );
 }
