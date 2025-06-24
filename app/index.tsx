@@ -1,5 +1,11 @@
 import { styles } from "@/styles/app.styled";
-import { PlaceResult } from "@/types/place";
+import {
+  DISTANCE_FILTERS,
+  RATING_FILTERS,
+  REVIEWS_FILTERS,
+} from "@/utils/constants";
+import { PlaceResult } from "@/utils/place";
+import { LocationType } from "@/utils/types";
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -12,6 +18,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Dropdown } from "react-native-element-dropdown";
 import {
   Gesture,
   GestureDetector,
@@ -24,14 +31,67 @@ const GOOGLE_PLACES_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
 const ITEM_HEIGHT = 80;
 
 export default function HomePage() {
-  const [location, setLocation] = useState<{
-    latitude: number;
-    longitude: number;
-  } | null>(null);
+  const flatListRef = useRef<FlatList>(null);
+
+  const [location, setLocation] = useState<LocationType>(null);
   const [coffeeShops, setCoffeeShops] = useState<Array<PlaceResult>>([]);
+  const [filters, setFilters] = useState({
+    rating: 4.0,
+    distance: 2000,
+    reviews: 20,
+  });
   const [loading, setLoading] = useState(true);
   const [listHeight, setListHeight] = useState(300);
-  const flatListRef = useRef<FlatList>(null);
+
+  const findNearbyCoffeeShops = useCallback(
+    async (latitude: number, longitude: number) => {
+      try {
+        const radius = filters.distance;
+        const searches = [
+          `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=cafe&key=${GOOGLE_PLACES_API_KEY}`,
+          `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&keyword=coffee&key=${GOOGLE_PLACES_API_KEY}`,
+          `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&keyword=espresso&key=${GOOGLE_PLACES_API_KEY}`,
+        ];
+
+        const allResults = [];
+        const seenPlaceIds = new Set();
+
+        for (const url of searches) {
+          const response = await fetch(url);
+          const data = await response.json();
+
+          if (data.status === "OK") {
+            const newResults = data.results.filter((place: PlaceResult) => {
+              // Check for duplicates
+              if (seenPlaceIds.has(place.place_id)) return false;
+
+              const hasGoodRating =
+                place.rating && place.rating > filters.rating;
+              const hasEnoughReviews =
+                place.user_ratings_total &&
+                place.user_ratings_total > filters.rating;
+
+              if (hasGoodRating && hasEnoughReviews) {
+                seenPlaceIds.add(place.place_id);
+                return true;
+              }
+
+              return false;
+            });
+            allResults.push(...newResults);
+          }
+        }
+
+        setCoffeeShops(allResults);
+      } catch (error) {
+        console.error("Error fetching coffee shops:", error);
+        Alert.alert("Error", "Failed to fetch coffee shops");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [filters]
+  );
 
   const getCurrentLocation = useCallback(async () => {
     try {
@@ -57,46 +117,11 @@ export default function HomePage() {
       Alert.alert("Error", "Failed to get your location");
       setLoading(false);
     }
-  }, []);
+  }, [findNearbyCoffeeShops]);
 
   useEffect(() => {
     getCurrentLocation();
   }, [getCurrentLocation]);
-
-  const findNearbyCoffeeShops = async (latitude: number, longitude: number) => {
-    try {
-      const radius = 2000;
-      const searches = [
-        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=cafe&key=${GOOGLE_PLACES_API_KEY}`,
-        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&keyword=coffee&key=${GOOGLE_PLACES_API_KEY}`,
-        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&keyword=espresso&key=${GOOGLE_PLACES_API_KEY}`,
-      ];
-
-      const allResults = [];
-      const seenPlaceIds = new Set();
-
-      for (const url of searches) {
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (data.status === "OK") {
-          const newResults = data.results.filter((place: PlaceResult) => {
-            if (seenPlaceIds.has(place.place_id)) return false;
-            seenPlaceIds.add(place.place_id);
-            return true;
-          });
-          allResults.push(...newResults);
-        }
-      }
-
-      setCoffeeShops(allResults);
-    } catch (error) {
-      console.error("Error fetching coffee shops:", error);
-      Alert.alert("Error", "Failed to fetch coffee shops");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const calculateDistance = (
     lat1: number,
@@ -184,6 +209,21 @@ export default function HomePage() {
     }, 100);
   };
 
+  const handleRatingChange = (item: { value: number }) => {
+    setFilters((f) => ({ ...f, rating: item.value }));
+    if (location) findNearbyCoffeeShops(location.latitude, location.longitude);
+  };
+
+  const handleDistanceChange = (item: { value: number }) => {
+    setFilters((f) => ({ ...f, distance: item.value }));
+    if (location) findNearbyCoffeeShops(location.latitude, location.longitude);
+  };
+
+  const handleReviewsChange = (item: { value: number }) => {
+    setFilters((f) => ({ ...f, reviews: item.value }));
+    if (location) findNearbyCoffeeShops(location.latitude, location.longitude);
+  };
+
   const renderCoffeeShop = ({
     item,
     index,
@@ -232,7 +272,6 @@ export default function HomePage() {
       setListHeight(newHeight);
     })
     .onEnd(() => {
-      // Snap to either collapsed or expanded state
       const shouldCollapse = listHeight < 200;
       setListHeight(shouldCollapse ? 100 : 300);
     });
@@ -266,6 +305,46 @@ export default function HomePage() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Coffee Shops Near You</Text>
+        {/* Filter Dropdowns */}
+        <View
+          style={{
+            flexDirection: "row",
+            width: "100%",
+            gap: 10,
+            marginTop: 10,
+          }}
+        >
+          {/* Rating Filter */}
+          <Dropdown
+            style={{ flex: 1 }}
+            data={RATING_FILTERS}
+            labelField="label"
+            valueField="value"
+            placeholder="Rating"
+            value={filters.rating}
+            onChange={handleRatingChange}
+          />
+          {/* Distance Filter */}
+          <Dropdown
+            style={{ flex: 1 }}
+            data={DISTANCE_FILTERS}
+            labelField="label"
+            valueField="value"
+            placeholder="Distance"
+            value={filters.distance}
+            onChange={handleDistanceChange}
+          />
+          {/* Reviews Filter */}
+          <Dropdown
+            style={{ flex: 1 }}
+            data={REVIEWS_FILTERS}
+            labelField="label"
+            valueField="value"
+            placeholder="Reviews"
+            value={filters.reviews}
+            onChange={handleReviewsChange}
+          />
+        </View>
       </View>
 
       {/* Map View */}
@@ -295,9 +374,7 @@ export default function HomePage() {
         ))}
       </MapView>
 
-      {/* Draggable List */}
       <View style={[styles.draggableListContainer, { height: listHeight }]}>
-        {/* Drag Handle */}
         <GestureDetector gesture={panGesture}>
           <View style={styles.dragHandle}>
             <View style={styles.dragIndicator} />
