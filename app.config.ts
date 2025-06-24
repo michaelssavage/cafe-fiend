@@ -2,12 +2,17 @@ import 'dotenv/config';
 
 export default {
   expo: {
-    name: "coffee-fiend",
-    slug: "coffee-fiend",
+    extra: {
+      eas: {
+        projectId: "53c88c00-c79c-4708-8a6a-46a51be466df"
+      }
+    },
+    name: "cafe-fiend",
+    slug: "cafe-fiend",
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/images/icon.png",
-    scheme: "coffeefiend",
+    scheme: "cafefiend",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
     ios: {
@@ -17,6 +22,7 @@ export default {
       }
     },
     android: {
+      package: "com.michaelssavage.cafefiend",
       adaptiveIcon: {
         foregroundImage: "./assets/images/adaptive-icon.png",
         backgroundColor: "#ffffff"
