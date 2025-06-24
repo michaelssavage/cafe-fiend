@@ -1,18 +1,14 @@
 {
-  // Enable format on save
   "editor.formatOnSave": true,
 
-  // Run code actions (like ESLint fix) on save
   "editor.codeActionsOnSave": {
-    "source.fixAll": "explicit", // runs ESLint --fix
+    "source.fixAll": "explicit",
     "source.organizeImports": "explicit"
   },
 
-  // Optional: Format using ESLint instead of Prettier
   "eslint.format.enable": true,
-  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
 
-  // Make sure ESLint runs for all files
   "eslint.validate": [
     "javascript",
     "javascriptreact",

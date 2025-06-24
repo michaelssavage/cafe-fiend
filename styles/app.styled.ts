@@ -60,26 +60,11 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#8B4513',
   },
-  viewToggle: {
-    flexDirection: 'row',
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-    padding: 2,
-  },
-  toggleButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-  },
-  activeToggle: {
-    backgroundColor: '#8B4513',
-  },
   map: {
     flex: 1,
   },
   list: {
     flex: 1,
-    padding: 16,
   },
   shopItem: {
     backgroundColor: '#fff',
@@ -126,6 +111,32 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     color: '#8B4513',
     fontWeight: '600',
+  },
+  draggableListContainer: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  dragHandle: {
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  dragIndicator: {
+    width: 40,
+    height: 4,
+    backgroundColor: '#ddd',
+    borderRadius: 2,
+  },
+  listContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 20,
   },
   footer: {
     backgroundColor: '#fff',
