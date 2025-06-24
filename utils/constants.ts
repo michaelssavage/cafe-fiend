@@ -20,3 +20,5 @@ export const RATING_FILTERS = [
   { label: "⭐ 4.5+", value: 4.5 },
   { label: "⭐ 4.9", value: 4.9 },
 ]
+
+export const ITEM_HEIGHT = 112; // 100 + 12;

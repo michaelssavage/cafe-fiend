@@ -68,7 +68,6 @@ export const styles = StyleSheet.create({
   shopItem: {
     backgroundColor: '#fff',
     padding: 16,
-    marginBottom: 12,
     borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
@@ -136,6 +135,7 @@ export const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: 16,
     paddingBottom: 20,
+    gap: 12
   },
   footer: {
     backgroundColor: '#fff',
