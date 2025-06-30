@@ -6,6 +6,11 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
+  flexBox: {
+    flexDirection: 'row',
+    gap: 10,
+    width: "100%",
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
