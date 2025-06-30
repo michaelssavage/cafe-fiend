@@ -6,18 +6,11 @@ import {
   REVIEWS_FILTERS,
 } from "@/utils/constants";
 import { PlaceResult } from "@/utils/place";
+import { getFavourites } from "@/utils/storage";
 import { LocationType } from "@/utils/types";
-import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ActivityIndicator, Alert, FlatList, Text, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import {
   Gesture,
@@ -44,6 +37,7 @@ export default function HomePage() {
     distance: 2000,
     reviews: 20,
   });
+  const [favouriteIds, setFavouriteIds] = useState<Array<string>>([]);
 
   const listHeight = useSharedValue(300);
   const startHeight = useSharedValue(300);
@@ -51,9 +45,19 @@ export default function HomePage() {
     return { height: listHeight.value };
   });
 
+  const addCoffeeShops = useCallback((newResults: Array<PlaceResult>) => {
+    setCoffeeShops((prev) => {
+      const seen = new Set(prev.map((p) => p.place_id));
+      const filtered = newResults.filter((place) => !seen.has(place.place_id));
+      return [...prev, ...filtered];
+    });
+  }, []);
+
   const findNearbyCoffeeShops = useCallback(
     async (latitude: number, longitude: number) => {
       try {
+        setCoffeeShops([]); // Clear previous results
+        setLoading(true);
         const radius = filters.distance;
         const searches = [
           `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=cafe&key=${GOOGLE_PLACES_API_KEY}`,
@@ -61,49 +65,49 @@ export default function HomePage() {
           `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&keyword=espresso&key=${GOOGLE_PLACES_API_KEY}`,
         ];
 
-        const allResults = [];
         const seenPlaceIds = new Set();
-
+        let fetchCount = 0;
         for (const url of searches) {
-          const response = await fetch(url);
-          const data = await response.json();
-
-          if (data.status === "OK") {
-            const newResults = data.results.filter((place: PlaceResult) => {
-              // Check for duplicates
-              if (seenPlaceIds.has(place.place_id)) return false;
-
-              const hasGoodRating =
-                place.rating && place.rating > filters.rating;
-              const hasEnoughReviews =
-                place.user_ratings_total &&
-                place.user_ratings_total > filters.rating;
-
-              if (hasGoodRating && hasEnoughReviews) {
-                seenPlaceIds.add(place.place_id);
-                return true;
+          fetchCount++;
+          fetch(url)
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.status === "OK") {
+                const newResults = data.results.filter((place: PlaceResult) => {
+                  if (seenPlaceIds.has(place.place_id)) return false;
+                  const hasGoodRating =
+                    place.rating && place.rating > filters.rating;
+                  const hasEnoughReviews =
+                    place.user_ratings_total &&
+                    place.user_ratings_total > filters.reviews;
+                  if (hasGoodRating && hasEnoughReviews) {
+                    seenPlaceIds.add(place.place_id);
+                    return true;
+                  }
+                  return false;
+                });
+                addCoffeeShops(newResults);
               }
-
-              return false;
+            })
+            .catch((error) => {
+              console.error("Error fetching coffee shops:", error);
+            })
+            .finally(() => {
+              fetchCount--;
+              if (fetchCount === 0) setLoading(false);
             });
-            allResults.push(...newResults);
-          }
         }
-
-        setCoffeeShops(allResults);
       } catch (error) {
         console.error("Error fetching coffee shops:", error);
         Alert.alert("Error", "Failed to fetch coffee shops");
-      } finally {
         setLoading(false);
       }
     },
-    [filters]
+    [filters, addCoffeeShops]
   );
 
   const getCurrentLocation = useCallback(async () => {
     try {
-      // Request location permissions
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
@@ -113,13 +117,10 @@ export default function HomePage() {
         setLoading(false);
         return;
       }
-
-      // Get current location
       const currentLocation = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = currentLocation.coords;
-
       setLocation({ latitude, longitude });
-      await findNearbyCoffeeShops(latitude, longitude);
+      findNearbyCoffeeShops(latitude, longitude);
     } catch (error) {
       console.error("Error getting location:", error);
       Alert.alert("Error", "Failed to get your location");
@@ -130,6 +131,14 @@ export default function HomePage() {
   useEffect(() => {
     getCurrentLocation();
   }, [getCurrentLocation]);
+
+  useEffect(() => {
+    const syncFavourites = async () => {
+      const favs = await getFavourites();
+      setFavouriteIds(favs.map((f) => f.place_id));
+    };
+    syncFavourites();
+  }, [coffeeShops]);
 
   const scrollToShop = (shopIndex: number) => {
     if (
@@ -203,35 +212,41 @@ export default function HomePage() {
       }
     });
 
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#8B4513" />
-        <Text style={styles.loadingText}>Finding coffee shops near you...</Text>
-      </View>
-    );
-  }
+  const defaultRegion = {
+    latitude: 41.38879, // Barcelona
+    longitude: 2.15899,
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
+  };
 
-  if (!location) {
-    return (
-      <View style={styles.errorContainer}>
-        <Ionicons name="location-outline" size={48} color="#666" />
-        <Text style={styles.errorText}>Unable to get your location</Text>
-        <TouchableOpacity
-          style={styles.retryButton}
-          onPress={getCurrentLocation}
-        >
-          <Text style={styles.retryButtonText}>Try Again</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+  const getRegion = () => {
+    if (
+      location &&
+      typeof location.latitude === "number" &&
+      typeof location.longitude === "number"
+    ) {
+      return {
+        latitude: location.latitude,
+        longitude: location.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      };
+    }
+    return defaultRegion;
+  };
 
   return (
     <GestureHandlerRootView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Coffee Shops Near You</Text>
+        {loading && (
+          <ActivityIndicator
+            size="small"
+            color="#8B4513"
+            style={{ marginTop: 5 }}
+          />
+        )}
         {/* Filter Dropdowns */}
         <View
           style={{
@@ -283,13 +298,9 @@ export default function HomePage() {
       {/* Map View */}
       <MapView
         style={[styles.map, { flex: 1 }]}
-        initialRegion={{
-          latitude: location.latitude,
-          longitude: location.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        }}
-        showsUserLocation
+        initialRegion={getRegion()}
+        region={getRegion()}
+        showsUserLocation={!!location}
         showsMyLocationButton
       >
         {coffeeShops.map((shop, index) => (
@@ -301,7 +312,9 @@ export default function HomePage() {
             }}
             title={shop.name}
             description={shop.vicinity}
-            pinColor="#8B4513"
+            pinColor={
+              favouriteIds.includes(shop.place_id) ? "#144ba9" : "#8B4513"
+            }
             onPress={() => scrollToShop(index)}
           />
         ))}
