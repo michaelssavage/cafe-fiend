@@ -6,3 +6,9 @@ export type LocationType = {
 } | null
 
 export interface CoffeeShopI { item: PlaceResult, location: LocationType }
+
+export type FiltersType = {
+  rating: number,
+  distance: number,
+  reviews: number
+}
