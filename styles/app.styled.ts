@@ -93,8 +93,9 @@ export const styles = StyleSheet.create({
   },
   shopDetails: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     alignItems: 'center',
+    gap: 16
   },
   rating: {
     flexDirection: 'row',

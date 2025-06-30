@@ -4,7 +4,7 @@ export default {
   expo: {
     extra: {
       eas: {
-        projectId: "53c88c00-c79c-4708-8a6a-46a51be466df"
+        projectId: "9b8e6769-75f4-459b-8e1f-9b15710b5320"
       }
     },
     name: "cafe-fiend",

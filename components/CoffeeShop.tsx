@@ -1,8 +1,9 @@
 import { styles } from "@/styles/app.styled";
 import { PlaceResult } from "@/utils/place";
+import { getFavourites, removeFavourite, saveFavourite } from "@/utils/storage";
 import { CoffeeShopI } from "@/utils/types";
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Linking, Text, TouchableOpacity, View } from "react-native";
 
 const R = 6371; // Earth's radius in kilometers
@@ -48,6 +49,16 @@ const openInMaps = async (shop: PlaceResult) => {
 };
 
 export const CoffeeShop = ({ item, location }: CoffeeShopI) => {
+  const [isFavourite, setIsFavourite] = useState(false);
+
+  useEffect(() => {
+    const checkFavourite = async () => {
+      const favs = await getFavourites();
+      setIsFavourite(favs.some((shop) => shop.place_id === item.place_id));
+    };
+    checkFavourite();
+  }, [item.place_id]);
+
   const distance = location
     ? calculateDistance(
         location.latitude,
@@ -57,8 +68,22 @@ export const CoffeeShop = ({ item, location }: CoffeeShopI) => {
       )
     : "N/A";
 
+  const handleToggleFavourite = async (shop: PlaceResult) => {
+    try {
+      if (isFavourite) {
+        await removeFavourite(shop.place_id);
+        setIsFavourite(false);
+      } else {
+        await saveFavourite(shop);
+        setIsFavourite(true);
+      }
+    } catch (err) {
+      console.error("Failed to toggle favourite", err);
+    }
+  };
+
   return (
-    <TouchableOpacity style={styles.shopItem} onPress={() => openInMaps(item)}>
+    <View style={styles.shopItem}>
       <View style={styles.shopInfo}>
         <Text style={styles.shopName}>{item.name}</Text>
         <Text style={styles.shopAddress}>{item.vicinity}</Text>
@@ -72,7 +97,28 @@ export const CoffeeShop = ({ item, location }: CoffeeShopI) => {
           <Text style={styles.distance}>{distance} km</Text>
         </View>
       </View>
-      <Ionicons name="chevron-forward" size={20} color="#666" />
-    </TouchableOpacity>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+        <TouchableOpacity
+          onPress={() => openInMaps(item)}
+          accessibilityLabel="Open in Maps"
+          style={{ padding: 4 }}
+        >
+          <Ionicons name="map" size={22} color="#666" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => handleToggleFavourite(item)}
+          accessibilityLabel={
+            isFavourite ? "Remove from Favourites" : "Add to Favourites"
+          }
+          style={{ padding: 4 }}
+        >
+          <Ionicons
+            name={isFavourite ? "heart" : "heart-outline"}
+            size={22}
+            color="#e74c3c"
+          />
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
