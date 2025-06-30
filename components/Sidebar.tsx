@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { Text, TouchableOpacity } from "react-native";
 import Animated, {
@@ -13,6 +14,7 @@ interface SidebarI {
 }
 
 export const Sidebar = ({ setSidebarOpen }: SidebarI) => {
+  const router = useRouter();
   const translateX = useSharedValue(250);
   const opacity = useSharedValue(0);
 
@@ -40,6 +42,14 @@ export const Sidebar = ({ setSidebarOpen }: SidebarI) => {
     opacity.value = withTiming(0, { duration: 300 }, () => {
       runOnJS(setSidebarOpen)(false);
     });
+  };
+
+  const navigateToFavorites = () => {
+    closeSidebar();
+    // Navigate after sidebar closes
+    setTimeout(() => {
+      router.push("/favorites");
+    }, 300);
   };
 
   return (
@@ -82,7 +92,30 @@ export const Sidebar = ({ setSidebarOpen }: SidebarI) => {
         >
           <Ionicons name="close-outline" size={28} />
         </TouchableOpacity>
-        <Text style={{ fontSize: 18, fontWeight: "bold" }}>Favorites</Text>
+
+        {/* Favorites Navigation */}
+        <TouchableOpacity
+          onPress={navigateToFavorites}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            paddingVertical: 12,
+            paddingHorizontal: 8,
+            borderRadius: 8,
+            backgroundColor: "#f5f5f5",
+            marginBottom: 10,
+          }}
+        >
+          <Ionicons
+            name="heart"
+            size={20}
+            color="#8B4513"
+            style={{ marginRight: 12 }}
+          />
+          <Text style={{ fontSize: 18, fontWeight: "bold", color: "#8B4513" }}>
+            Favorites
+          </Text>
+        </TouchableOpacity>
       </Animated.View>
     </Animated.View>
   );
