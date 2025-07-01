@@ -1,21 +1,23 @@
-// https://docs.expo.dev/guides/using-eslint/
-const { defineConfig } = require('eslint/config');
-const expoConfig = require('eslint-config-expo/flat');
-const tsEslintPlugin = require('@typescript-eslint/eslint-plugin');
-const reactHooksPlugin = require('eslint-plugin-react-hooks');
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+import tseslint from 'typescript-eslint'
+import { globalIgnores } from 'eslint/config'
 
-module.exports = defineConfig([
-  expoConfig,
+export default tseslint.config([
+  globalIgnores(['dist']),
   {
-    ignores: ['dist/*'],
-    plugins: {
-      '@typescript-eslint': tsEslintPlugin,
-      'react-hooks': reactHooksPlugin,
-    },
-    rules: {
-      '@typescript-eslint/array-type': ['error', { default: 'generic' }],
-      'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'warn',
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      js.configs.recommended,
+      tseslint.configs.recommended,
+      reactHooks.configs['recommended-latest'],
+      reactRefresh.configs.vite,
+    ],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
     },
   },
-]);
+])
