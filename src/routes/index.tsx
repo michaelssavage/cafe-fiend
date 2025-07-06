@@ -1,89 +1,85 @@
-import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { Home03 } from "@untitled-ui/icons-react/";
 import {
-  APIProvider,
   AdvancedMarker,
   Map as GoogleMap,
   Pin,
 } from "@vis.gl/react-google-maps";
 import { useEffect, useState } from "react";
-import { FaRegUser } from "react-icons/fa";
-import { ShopMarker } from "../components/shop-marker/ShopMarker";
-import { useGeolocation } from "../hooks/use-location.hook";
-import { findNearbyCoffeeShops } from "../lib/get-nearby-cafes.api";
-import { Container } from "../styles/global.styled";
-import type { FiltersI } from "../utils/global.types";
-
+import { ShopMarker } from "~/components/shop-marker/ShopMarker";
+import { useCoffeeShops } from "~/hooks/use-coffee.hook";
+import { useGeolocation } from "~/hooks/use-location.hook";
+import { Container, Flexbox } from "~/styles/global.styles";
+import { FiltersI } from "~/utils/global.type";
 export const Route = createFileRoute("/")({
-  component: HomeComponent,
+  component: Home,
 });
 
-const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;
-
-function HomeComponent() {
-  const { location, error, loading, getCurrentLocation } = useGeolocation();
-
+function Home() {
   const [filters, setFilters] = useState<FiltersI>({
     rating: 4.0,
-    distance: 2000,
+    radius: 2000,
     reviews: 20,
   });
 
-  const { isLoading, data } = useQuery({
-    queryKey: ["coffee", filters, location],
-    queryFn: () =>
-      findNearbyCoffeeShops({
-        latitude: location.lat,
-        longitude: location.lng,
-        filters,
-      }),
+  const {
+    location,
+    error: locationError,
+    loading,
+    getCurrentLocation,
+  } = useGeolocation();
+
+  const { data, isLoading } = useCoffeeShops({
+    lat: location.lat,
+    long: location.lng,
+    filters,
   });
 
   useEffect(() => {
     getCurrentLocation();
   }, []);
 
-  console.log("!!!", data);
-
   return (
-    <APIProvider apiKey={key}>
-      <Container>
-        <h1>Cafe Fiend</h1>
+    <Container>
+      <h1>Cafe Fiend</h1>
+      <Flexbox direction="row" align="center" gap="1rem">
         <p>Find your next favourite coffee</p>
         <button
           type="button"
           onClick={getCurrentLocation}
-          disabled={!!error || loading}
+          disabled={!!location || loading}
         >
           {loading ? "Loading..." : "Get Location"}
         </button>
+      </Flexbox>
 
-        {isLoading && <p>Loading coffee shops...</p>}
-        <div style={{ height: "500px" }}>
-          <GoogleMap
-            defaultCenter={location}
-            defaultZoom={13}
-            mapId="google-maps-id"
-          >
-            <AdvancedMarker position={location}>
-              <Pin
-                background={"#22ccff"}
-                borderColor={"#1e89a1"}
-                glyphColor={"#0f677a"}
-              >
-                <FaRegUser />
-              </Pin>
-            </AdvancedMarker>
-            {data ? (
-              data.map((shop, index) => {
-                return <ShopMarker key={index} shop={shop} index={index} />;
-              })
-            ) : (
-              <></>
-            )}
-          </GoogleMap>
-        </div>
-      </Container>
-    </APIProvider>
+      {isLoading && <p>Loading coffee shops...</p>}
+      {locationError && <p>Failed to get user location</p>}
+      <div style={{ height: "500px" }}>
+        <GoogleMap
+          defaultCenter={location}
+          defaultZoom={13}
+          mapId="google-maps-id"
+          gestureHandling="greedy"
+          disableDefaultUI
+        >
+          <AdvancedMarker position={location}>
+            <Pin
+              background={"#2922ff"}
+              borderColor={"#2b1ea1"}
+              glyphColor={"#0f237a"}
+            >
+              <Home03 width={14} height={14} color="#ffffff" />
+            </Pin>
+          </AdvancedMarker>
+
+          {data && data?.results?.length > 0 ? (
+            <ShopMarker shops={data?.results} />
+          ) : (
+            <></>
+          )}
+        </GoogleMap>
+      </div>
+    </Container>
   );
 }

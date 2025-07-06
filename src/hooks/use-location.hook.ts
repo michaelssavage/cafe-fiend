@@ -1,16 +1,19 @@
 import { useCallback, useState } from 'react';
-import type { LocationI } from '../utils/global.types';
+import { defaultPosition } from '~/utils/constants';
+import type { LocationI } from '../utils/global.type';
 
-
-const initialLocation = {
-  lat: 41.38879, 
-  lng: 2.15899,
-  accuracy: 1,
-  timestamp: 0
-}
+const options = {
+  enableHighAccuracy: true,
+  timeout: 10000,
+  maximumAge: 300000 // 5 minutes
+};
 
 export const useGeolocation = () => {
-  const [location, setLocation] = useState<LocationI>(initialLocation);
+  const [location, setLocation] = useState<LocationI>({
+    ...defaultPosition,
+    accuracy: 1,
+    timestamp: 0
+  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -22,12 +25,6 @@ export const useGeolocation = () => {
 
     setLoading(true);
     setError('');
-
-    const options = {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 300000 // 5 minutes
-    };
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
