@@ -9,3 +9,10 @@ export interface FindNearbyCafesP {
   longitude: number;
   filters: FiltersI;
 }
+
+export interface LocationI {
+  lat: number,
+  lng: number,
+  accuracy: number,
+  timestamp: number
+}

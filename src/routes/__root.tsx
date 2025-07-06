@@ -5,10 +5,10 @@ import { Navbar } from "../components/Navbar";
 export const Route = createRootRoute({
   component: () => (
     <>
-      <Navbar />
-      <hr />
+      <TanStackRouterDevtools position="top-right" />
       <Outlet />
-      <TanStackRouterDevtools />
+      <hr />
+      <Navbar />
     </>
   ),
 });

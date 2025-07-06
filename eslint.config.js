@@ -11,15 +11,23 @@ export default tseslint.config([
   {
     files: ["**/*.{ts,tsx}"],
     extends: [
-      ...pluginQuery.configs["flat/recommended"],
       js.configs.recommended,
-      tseslint.configs.recommended,
+      ...pluginQuery.configs["flat/recommended"],
+      ...tseslint.configs.recommendedTypeChecked,
+      ...tseslint.configs.stylisticTypeChecked,
       reactHooks.configs["recommended-latest"],
       reactRefresh.configs.vite,
     ],
+    rules: {
+      "@typescript-eslint/no-unused-vars": "warn",
+    },
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+      parserOptions: {
+        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
   },
 ]);

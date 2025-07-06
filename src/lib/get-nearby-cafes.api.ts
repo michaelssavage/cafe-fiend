@@ -7,12 +7,14 @@ export const findNearbyCoffeeShops = async ({
   filters,
 }: FindNearbyCafesP): Promise<PlaceResult[]> => {
   try {
-    const response = await fetch(
-      `/.netlify/functions/nearby-cafes?latitude=${latitude}&longitude=${longitude}&radius=${filters.distance}`
-    );
+    const url = `/.netlify/functions/nearby-cafes?latitude=${latitude}&longitude=${longitude}&radius=${filters.distance}`;
+    console.log("Fetching from:", url);
+    
+    const response = await fetch(url);
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
     }
 
     const data = await response.json();
