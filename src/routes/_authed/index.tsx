@@ -41,9 +41,19 @@ function Home() {
   } = useFavorites();
 
   const handleToggleFavorite = (placeId: string, name: string) => {
+    console.log(
+      "Toggle favorite - placeId:",
+      placeId,
+      "name:",
+      name,
+      "isFavorite:",
+      isFavorite(placeId)
+    );
     if (isFavorite(placeId)) {
+      console.log("Calling removeFavorite");
       removeFavorite(placeId);
     } else {
+      console.log("Calling saveFavorite");
       saveFavorite(placeId, name);
     }
   };

@@ -18,17 +18,21 @@ export function useFavorites() {
 
   const removeMutation = useMutation({
     mutationFn: removeFavorite,
-    onSuccess: () => {
+    onSuccess: (data) => {
       void queryClient.invalidateQueries({ queryKey: ['favorites'] });
+    },
+    onError: (error) => {
+      console.error("Remove mutation - Error:", error);
     },
   });
 
   const handleSaveFavorite = (placeId: string, name: string) => {
-    saveMutation.mutate({ placeId, name });
+    saveMutation.mutate({ data: { placeId, name } });
   };
 
   const handleRemoveFavorite = (placeId: string) => {
-    removeMutation.mutate({ placeId });
+    console.log("Hook - Removing favorite for placeId:", placeId);
+    removeMutation.mutate({ data: { placeId } });
   };
 
   const isFavorite = (placeId: string) => {

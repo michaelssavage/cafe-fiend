@@ -2,6 +2,7 @@ import {
   AdvancedMarker,
   AdvancedMarkerAnchorPoint,
   InfoWindow,
+  Pin,
 } from "@vis.gl/react-google-maps";
 import { useCallback, useState } from "react";
 import { Flexbox } from "~/styles/global.styles";
@@ -65,6 +66,10 @@ export const ShopMarker = ({
 
   const handleToggleFavorite = useCallback(
     (placeId: string, name: string) => {
+      if (!placeId || !name) {
+        console.error("Invalid placeId or name:", { placeId, name });
+        return;
+      }
       onToggleFavorite(placeId, name);
     },
     [onToggleFavorite]
@@ -74,6 +79,13 @@ export const ShopMarker = ({
     <>
       {data.map((shop) => {
         const shopId = shop.place_id;
+
+        // Skip rendering if place_id is null or undefined
+        if (!shopId) {
+          console.warn("Shop missing place_id:", shop);
+          return null;
+        }
+
         let zIndex = shop.zIndex;
 
         if (hoverId === shopId) {
@@ -108,7 +120,13 @@ export const ShopMarker = ({
                 transformOrigin: AdvancedMarkerAnchorPoint.BOTTOM.join(" "),
               }}
               position={position}
-            />
+            >
+              <Pin
+                background={isShopFavorite ? "#0f9d58" : "#EA4335"}
+                borderColor={isShopFavorite ? "#0f9d58" : "#C5221F"}
+                glyphColor={isShopFavorite ? "#0d8249" : "#C5221F"}
+              />
+            </AdvancedMarker>
 
             {selectedId === shopId && infoWindowShown && (
               <InfoWindow

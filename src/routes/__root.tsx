@@ -13,7 +13,7 @@ import { ErrorBoundary } from "~/components/ErrorBoundary";
 import { Head } from "~/components/Head";
 import { Navbar } from "~/components/navbar/Navbar";
 import { NotFound } from "~/components/NotFound.js";
-import { fetchUser } from "~/functions/fetch-user.function";
+import { fetchUser } from "~/functions/fetch-user.fn";
 
 const queryClient = new QueryClient();
 const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;

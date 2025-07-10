@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Auth } from "~/components/auth/Auth";
-import { signupFn } from "~/functions/signup.function";
+import { signupFn } from "~/functions/signup.fn";
 
 export const Route = createFileRoute("/signup")({
   component: SignupComp,

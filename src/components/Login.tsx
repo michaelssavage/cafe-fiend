@@ -2,8 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { FormEvent, MouseEvent } from "react";
-import { loginFn } from "../functions/login.function";
-import { signupFn } from "../functions/signup.function";
+import { loginFn } from "../functions/login.fn";
+import { signupFn } from "../functions/signup.fn";
 import { Auth } from "./auth/Auth";
 
 export function Login() {
@@ -12,7 +12,6 @@ export function Login() {
   const loginMutation = useMutation({
     mutationFn: loginFn,
     onSuccess: async (data) => {
-      console.log("!!!login", data);
       if (data && !data.error) {
         await router.invalidate();
         await router.navigate({ to: "/" });

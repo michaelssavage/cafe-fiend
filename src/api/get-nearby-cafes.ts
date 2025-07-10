@@ -18,6 +18,12 @@ interface PlaceFilters {
 
 const filterResults = (results: Array<PlaceResult>, filters: PlaceFilters) => {
   const filteredResults = results.filter((place) => {
+    // Ensure place has a valid place_id
+    if (!place.place_id) {
+      console.warn('Place missing place_id:', place);
+      return false;
+    }
+    
     const businessIsOpen = place.business_status === "OPERATIONAL" && !place.permanently_closed;
 
     const hasGoodRating = place.rating && place.rating > filters.rating;
