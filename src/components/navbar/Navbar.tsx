@@ -1,12 +1,6 @@
-import {
-  SignInButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@clerk/tanstack-react-start";
 import { Link } from "@tanstack/react-router";
 import { Flexbox } from "~/styles/global.styles";
-import { Nav } from "./Navbar.styles";
+import { Nav } from "./Navbar.styled";
 
 export const Navbar = () => {
   return (
@@ -21,14 +15,6 @@ export const Navbar = () => {
         >
           Posts
         </Link>
-      </Flexbox>
-      <Flexbox direction="row" align="center" gap="4px">
-        <SignedIn>
-          <UserButton />
-        </SignedIn>
-        <SignedOut>
-          <SignInButton mode="modal" />
-        </SignedOut>
       </Flexbox>
     </Nav>
   );

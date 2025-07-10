@@ -1,19 +1,15 @@
-import { SignIn } from "@clerk/tanstack-react-start";
 import { createFileRoute } from "@tanstack/react-router";
+import { Login } from "../components/Login";
 
 export const Route = createFileRoute("/_authed")({
   beforeLoad: ({ context }) => {
-    if (!context.userId) {
+    if (!context.user) {
       throw new Error("Not authenticated");
     }
   },
   errorComponent: ({ error }) => {
     if (error.message === "Not authenticated") {
-      return (
-        <div>
-          <SignIn routing="hash" forceRedirectUrl={window.location.href} />
-        </div>
-      );
+      return <Login />;
     }
 
     throw error;

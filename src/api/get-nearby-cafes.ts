@@ -1,14 +1,32 @@
 import { createServerFn } from '@tanstack/react-start';
-import { FindNearbyCafesP } from '~/utils/global.type';
-import type { PlaceResult } from "../utils/place.type";
+import { FindNearbyCafesP } from '~/types/global.type';
+import type { PlaceResult } from "../types/place.type";
 
-const filterResults = (results: Array<PlaceResult>, filters: any) => {
+// Type definitions for Google Places API response
+interface GooglePlacesResponse {
+  status: string;
+  results: Array<PlaceResult>;
+  error_message?: string;
+}
+
+// Type definition for filters
+interface PlaceFilters {
+  radius: number;
+  rating: number;
+  reviews: number;
+}
+
+const filterResults = (results: Array<PlaceResult>, filters: PlaceFilters) => {
   const filteredResults = results.filter((place) => {
+    const businessIsOpen = place.business_status === "OPERATIONAL" && !place.permanently_closed;
+
     const hasGoodRating = place.rating && place.rating > filters.rating;
     const hasEnoughReviews =
       place.user_ratings_total &&
       place.user_ratings_total > filters.reviews;
-    return hasGoodRating && hasEnoughReviews;
+
+
+    return businessIsOpen && hasGoodRating && hasEnoughReviews;
   });
 
   return filteredResults;
@@ -67,7 +85,7 @@ export const findNearbyCoffeeShops = createServerFn({
   };
 }).handler(async ({ data }) => {
   try {
-    const url: string = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${data.latitude},${data.longitude}&radius=${data.filters.radius}&type=cafe&key=${process.env.VITE_GOOGLE_MAPS_API_KEY}`;
+    const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${data.latitude},${data.longitude}&radius=${data.filters.radius}&type=cafe&key=${process.env.VITE_GOOGLE_MAPS_API_KEY}`;
     const response = await fetch(url);
     
     if (!response.ok) {
@@ -75,7 +93,7 @@ export const findNearbyCoffeeShops = createServerFn({
       throw new Error(`Google Places API error: ${response.status}`);
     }
 
-    const res = await response.json();
+    const res = await response.json() as GooglePlacesResponse;
 
     if (res.status === "OK") {
       const results = filterResults(res.results, data.filters);

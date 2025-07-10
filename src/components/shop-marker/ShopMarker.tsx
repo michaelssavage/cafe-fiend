@@ -4,10 +4,11 @@ import {
   InfoWindow,
 } from "@vis.gl/react-google-maps";
 import { useCallback, useState } from "react";
-import { StringOrNull } from "~/utils/global.type";
-import type { PlaceResult } from "../../utils/place.type";
+import { Flexbox } from "~/styles/global.styles";
+import { StringOrNull } from "~/types/global.type";
+import type { PlaceResult } from "../../types/place.type";
+import { Button } from "../button/Button";
 import {
-  ShopName,
   ShopRating,
   ShopStatus,
   ShopVicinity,
@@ -15,10 +16,20 @@ import {
 } from "./ShopMarker.styles";
 
 interface ShopMarkersProps {
-  shops: PlaceResult[];
+  shops: Array<PlaceResult>;
+  onToggleFavorite: (placeId: string, name: string) => void;
+  isFavorite: (placeId: string) => boolean;
+  isSaving: boolean;
+  isRemoving: boolean;
 }
 
-export const ShopMarker = ({ shops }: ShopMarkersProps) => {
+export const ShopMarker = ({
+  shops,
+  onToggleFavorite,
+  isFavorite,
+  isSaving,
+  isRemoving,
+}: ShopMarkersProps) => {
   const data = shops
     .sort((a, b) => b.geometry.location.lat - a.geometry.location.lat)
     .map((dataItem, index) => ({ ...dataItem, zIndex: index }));
@@ -52,6 +63,13 @@ export const ShopMarker = ({ shops }: ShopMarkersProps) => {
     []
   );
 
+  const handleToggleFavorite = useCallback(
+    (placeId: string, name: string) => {
+      onToggleFavorite(placeId, name);
+    },
+    [onToggleFavorite]
+  );
+
   return (
     <>
       {data.map((shop) => {
@@ -69,6 +87,9 @@ export const ShopMarker = ({ shops }: ShopMarkersProps) => {
           lng: shop.geometry.location.lng,
         };
 
+        const isShopFavorite = isFavorite(shopId);
+        const isActionDisabled = isSaving || isRemoving;
+
         return (
           <>
             <AdvancedMarker
@@ -84,7 +105,7 @@ export const ShopMarker = ({ shops }: ShopMarkersProps) => {
               zIndex={zIndex}
               style={{
                 transform: `scale(${[hoverId, selectedId].includes(shopId) ? 1.3 : 1})`,
-                transformOrigin: AdvancedMarkerAnchorPoint["BOTTOM"].join(" "),
+                transformOrigin: AdvancedMarkerAnchorPoint.BOTTOM.join(" "),
               }}
               position={position}
             />
@@ -94,9 +115,10 @@ export const ShopMarker = ({ shops }: ShopMarkersProps) => {
                 anchor={selectedMarker}
                 pixelOffset={[0, -2]}
                 onCloseClick={handleInfowindowCloseClick}
+                style={{ padding: 0 }}
+                headerContent={shop.name}
               >
                 <TitleContent>
-                  <ShopName>{shop.name}</ShopName>
                   <ShopVicinity>{shop.vicinity}</ShopVicinity>
                   {shop.rating && (
                     <ShopRating>
@@ -112,6 +134,29 @@ export const ShopMarker = ({ shops }: ShopMarkersProps) => {
                       {shop.opening_hours.open_now ? "Open now" : "Closed"}
                     </ShopStatus>
                   )}
+
+                  <Flexbox
+                    direction="row"
+                    margin="6px 0 0"
+                    gap="4px"
+                    justify="flex-end"
+                  >
+                    <Button
+                      text={
+                        isShopFavorite
+                          ? isActionDisabled
+                            ? "Removing..."
+                            : "Remove"
+                          : isActionDisabled
+                            ? "Saving..."
+                            : "Save"
+                      }
+                      onClick={() => handleToggleFavorite(shopId, shop.name)}
+                      disabled={isActionDisabled}
+                      variant={isShopFavorite ? "secondary" : "primary"}
+                    />
+                    <Button text="Hide" />
+                  </Flexbox>
                 </TitleContent>
               </InfoWindow>
             )}

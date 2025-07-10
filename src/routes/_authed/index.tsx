@@ -8,10 +8,12 @@ import {
 import { useEffect, useState } from "react";
 import { ShopMarker } from "~/components/shop-marker/ShopMarker";
 import { useCoffeeShops } from "~/hooks/use-coffee.hook";
+import { useFavorites } from "~/hooks/use-favorites.hook";
 import { useGeolocation } from "~/hooks/use-location.hook";
 import { Container, Flexbox } from "~/styles/global.styles";
-import { FiltersI } from "~/utils/global.type";
-export const Route = createFileRoute("/")({
+import { FiltersI } from "~/types/global.type";
+
+export const Route = createFileRoute("/_authed/")({
   component: Home,
 });
 
@@ -29,6 +31,23 @@ function Home() {
     getCurrentLocation,
   } = useGeolocation();
 
+  const {
+    favorites,
+    isFavorite,
+    saveFavorite,
+    removeFavorite,
+    isSaving,
+    isRemoving,
+  } = useFavorites();
+
+  const handleToggleFavorite = (placeId: string, name: string) => {
+    if (isFavorite(placeId)) {
+      removeFavorite(placeId);
+    } else {
+      saveFavorite(placeId, name);
+    }
+  };
+
   const { data, isLoading } = useCoffeeShops({
     lat: location.lat,
     long: location.lng,
@@ -37,7 +56,7 @@ function Home() {
 
   useEffect(() => {
     getCurrentLocation();
-  }, []);
+  }, [getCurrentLocation]);
 
   return (
     <Container>
@@ -57,9 +76,9 @@ function Home() {
       {locationError && <p>Failed to get user location</p>}
       <div style={{ height: "500px" }}>
         <GoogleMap
+          mapId="google-maps-id"
           defaultCenter={location}
           defaultZoom={13}
-          mapId="google-maps-id"
           gestureHandling="greedy"
           disableDefaultUI
         >
@@ -74,7 +93,13 @@ function Home() {
           </AdvancedMarker>
 
           {data && data?.results?.length > 0 ? (
-            <ShopMarker shops={data?.results} />
+            <ShopMarker
+              shops={data?.results}
+              onToggleFavorite={handleToggleFavorite}
+              isFavorite={isFavorite}
+              isSaving={isSaving}
+              isRemoving={isRemoving}
+            />
           ) : (
             <></>
           )}

@@ -51,7 +51,7 @@ export const ShopRating = styled.div`
 export const ShopStatus = styled.div`
   font-size: 12px;
   font-weight: bold;
-  padding: 2px 6px;
+  padding: 3px 6px;
   border-radius: 4px;
 
   &.open {

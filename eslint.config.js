@@ -20,12 +20,13 @@ export default tseslint.config([
     ],
     rules: {
       "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/array-type": ["error", { default: "generic" }],
     },
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
       parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
+        project: ["./tsconfig.json"],
         tsconfigRootDir: import.meta.dirname,
       },
     },

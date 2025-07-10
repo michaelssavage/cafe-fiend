@@ -14,6 +14,7 @@ export interface FlexboxProps {
   gap?: string;
   width?: string;
   flex?: string;
+  margin?: string;
 }
 
 export const Container = styled.div`
@@ -23,11 +24,12 @@ export const Container = styled.div`
 
 export const Flexbox = styled.div<FlexboxProps>`
   display: flex;
-  flex-direction: ${({ direction }) => direction || "column"};
-  gap: ${({ gap }) => gap || "10px"};
+  flex-direction: ${({ direction }) => direction ?? "column"};
+  gap: ${({ gap }) => gap ?? "10px"};
   justify-content: ${({ justify }) => justify};
   align-items: ${({ align }) => align};
   flex-wrap: ${({ wrap }) => wrap};
   width: ${({ width }) => width};
+  margin: ${({ margin }) => margin};
   flex: ${({ flex }) => flex};
 `;

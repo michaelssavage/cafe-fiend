@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { defaultPosition } from '~/utils/constants';
-import type { LocationI } from '../utils/global.type';
+import type { LocationI } from '../types/global.type';
 
 const options = {
   enableHighAccuracy: true,

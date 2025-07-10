@@ -14,6 +14,10 @@ export const ErrorBoundary = ({ error }: ErrorComponentProps) => {
     select: (state) => state.id === rootRouteId,
   });
 
+  const tryAgain = async () => {
+    await router.invalidate();
+  };
+
   console.error(error);
 
   return (
@@ -22,7 +26,7 @@ export const ErrorBoundary = ({ error }: ErrorComponentProps) => {
       <div>
         <button
           onClick={() => {
-            router.invalidate();
+            void tryAgain();
           }}
         >
           Try Again

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { findNearbyCoffeeShops } from "~/api/get-nearby-cafes";
-import { FindNearbyCafesP } from "~/utils/global.type";
+import { FindNearbyCafesP } from "~/types/global.type";
 
 
 export const useCoffeeShops = ({ lat, long, filters }: FindNearbyCafesP) => {
