@@ -1,53 +1,92 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
 import { getFavorites, removeFavorite, saveFavorite } from "~/api/favorites";
+import { CafeStatus } from "~/utils/constants";
 
 export function useFavorites() {
   const queryClient = useQueryClient();
 
   const { data: favorites = [], isLoading } = useQuery({
-    queryKey: ['favorites'],
+    queryKey: ["favorites"],
     queryFn: () => getFavorites(),
   });
 
-  const saveMutation = useMutation({
+  const {
+    mutate: saveMutate,
+    isPending: isSaving,
+    error: saveError,
+  } = useMutation({
     mutationFn: saveFavorite,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['favorites'] });
+      void queryClient.invalidateQueries({ queryKey: ["favorites"] });
     },
   });
 
-  const removeMutation = useMutation({
+  const {
+    mutate: removeMutate,
+    isPending: isRemoving,
+    error: removeError,
+  } = useMutation({
     mutationFn: removeFavorite,
-    onSuccess: (data) => {
-      void queryClient.invalidateQueries({ queryKey: ['favorites'] });
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["favorites"] });
     },
     onError: (error) => {
       console.error("Remove mutation - Error:", error);
     },
   });
 
-  const handleSaveFavorite = (placeId: string, name: string) => {
-    saveMutation.mutate({ data: { placeId, name } });
-  };
+  const handleSaveFavorite = useCallback(
+    (placeId: string, name: string) => {
+      saveMutate({ data: { placeId, name, status: CafeStatus.FAVORITE } });
+    },
+    [saveMutate]
+  );
 
-  const handleRemoveFavorite = (placeId: string) => {
-    console.log("Hook - Removing favorite for placeId:", placeId);
-    removeMutation.mutate({ data: { placeId } });
-  };
+  const handleRemoveFavorite = useCallback(
+    (placeId: string) => {
+      console.log("Hook - Removing favorite for placeId:", placeId);
+      removeMutate({ data: { placeId } });
+    },
+    [removeMutate]
+  );
 
-  const isFavorite = (placeId: string) => {
-    return favorites.some(fav => fav.placeId === placeId);
-  };
+  const isFavorite = useCallback(
+    (placeId: string) => {
+      return favorites.some(
+        (fav) => fav.placeId === placeId && fav.status === CafeStatus.FAVORITE
+      );
+    },
+    [favorites]
+  );
+
+  const isWishlist = useCallback(
+    (placeId: string) => {
+      return favorites.some(
+        (fav) => fav.placeId === placeId && fav.status === CafeStatus.WANT_TO_GO
+      );
+    },
+    [favorites]
+  );
+
+  const handleHideCafe = useCallback(
+    (placeId: string, name: string) => {
+      saveMutate({ data: { placeId, name, status: CafeStatus.HIDDEN } });
+    },
+    [saveMutate]
+  );
 
   return {
     favorites,
     isLoading,
     isFavorite,
-    saveFavorite: handleSaveFavorite,
-    removeFavorite: handleRemoveFavorite,
-    isSaving: saveMutation.isPending,
-    isRemoving: removeMutation.isPending,
-    saveError: saveMutation.error,
-    removeError: removeMutation.error,
+    isWishlist,
+    handleSaveFavorite,
+    handleRemoveFavorite,
+    handleHideCafe,
+    isSaving,
+    isRemoving,
+    saveError,
+    removeError,
   };
 }

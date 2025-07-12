@@ -1,2 +1,2 @@
 - npx supabase login
-- npx supabase gen types typescript --project-id XX > src\utils\supabase.type.ts
+- npx supabase gen types typescript --project-id XX > src\types\supabase.type.ts

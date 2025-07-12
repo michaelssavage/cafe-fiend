@@ -2,18 +2,19 @@ import type { PostgrestError } from "@supabase/supabase-js";
 import { createServerFn } from "@tanstack/react-start";
 import { getSupabaseServerClient } from "~/lib/supabase";
 
-import { Database } from '~/types/supabase.type';
+import { Database } from "~/types/supabase.type";
+import { CafeStatus } from "~/utils/constants";
 
-type Favorite = Database['public']['Tables']['favorites']['Row'];
+export type Favorite = Database["public"]["Tables"]["favorites"]["Row"];
 
-interface FavoriteResponse { 
-  data: Favorite | null; 
-  error: PostgrestError | null; 
+interface FavoriteResponse {
+  data: Favorite | null;
+  error: PostgrestError | null;
 }
 
 export const saveFavorite = createServerFn({ method: "POST" })
-  .validator((data: { placeId: string; name: string }) => {
-    if (!data.placeId || !data.name) {
+  .validator((data: { placeId: string; name: string; status: CafeStatus }) => {
+    if (!data.placeId || !data.name || !data.status) {
       throw new Error("placeId and name are required");
     }
     return data;
@@ -22,7 +23,10 @@ export const saveFavorite = createServerFn({ method: "POST" })
     const supabase = getSupabaseServerClient();
 
     const authResponse = await supabase.auth.getUser();
-    const { data: { user }, error: authError } = authResponse;
+    const {
+      data: { user },
+      error: authError,
+    } = authResponse;
 
     if (authError || !user) {
       throw new Error("Unauthorized");
@@ -34,6 +38,7 @@ export const saveFavorite = createServerFn({ method: "POST" })
         placeId: data.placeId,
         userId: user.id,
         name: data.name,
+        status: data.status,
         createdAt: new Date().toISOString(),
       })
       .select()
@@ -57,7 +62,10 @@ export const removeFavorite = createServerFn({ method: "POST" })
     const supabase = getSupabaseServerClient();
 
     const authResponse = await supabase.auth.getUser();
-    const { data: { user }, error: authError } = authResponse;
+    const {
+      data: { user },
+      error: authError,
+    } = authResponse;
 
     if (authError || !user) {
       throw new Error("Unauthorized");
@@ -65,17 +73,17 @@ export const removeFavorite = createServerFn({ method: "POST" })
 
     console.log("Remove favorite - User ID:", user.id);
     console.log("Remove favorite - Place ID:", data.placeId);
-    
+
     // First, let's check if the record exists
     const { data: existingRecord, error: selectError } = await supabase
       .from("favorites")
       .select("*")
       .eq("placeId", data.placeId)
       .eq("userId", user.id);
-    
+
     console.log("Existing record:", existingRecord);
     console.log("Select error:", selectError);
-    
+
     const { data: deleteResult, error } = await supabase
       .from("favorites")
       .delete()
@@ -93,12 +101,15 @@ export const removeFavorite = createServerFn({ method: "POST" })
     return { success: true };
   });
 
-export const getFavorites = createServerFn({ method: "GET" })
-  .handler(async () => {
+export const getFavorites = createServerFn({ method: "GET" }).handler(
+  async () => {
     const supabase = getSupabaseServerClient();
 
     const authResponse = await supabase.auth.getUser();
-    const { data: { user }, error: authError } = authResponse;
+    const {
+      data: { user },
+      error: authError,
+    } = authResponse;
 
     if (authError || !user) {
       throw new Error("Unauthorized");
@@ -115,4 +126,5 @@ export const getFavorites = createServerFn({ method: "GET" })
     }
 
     return (data as Array<Favorite>) || [];
-  });
+  }
+);

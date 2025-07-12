@@ -20,6 +20,7 @@ export interface Database {
           id: number
           name: string | null
           placeId: string
+          status: Database["public"]["Enums"]["cafe_status"] | null
           userId: string | null
         }
         Insert: {
@@ -27,6 +28,7 @@ export interface Database {
           id?: number
           name?: string | null
           placeId: string
+          status?: Database["public"]["Enums"]["cafe_status"] | null
           userId?: string | null
         }
         Update: {
@@ -34,46 +36,17 @@ export interface Database {
           id?: number
           name?: string | null
           placeId?: string
+          status?: Database["public"]["Enums"]["cafe_status"] | null
           userId?: string | null
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          avatar_url: string | null
-          full_name: string | null
-          id: string
-          updated_at: string | null
-          username: string | null
-          website: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          full_name?: string | null
-          id: string
-          updated_at?: string | null
-          username?: string | null
-          website?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          full_name?: string | null
-          id?: string
-          updated_at?: string | null
-          username?: string | null
-          website?: string | null
         }
         Relationships: []
       }
     }
     Views: Record<never, never>
-    Functions: {
-      get_clerk_user_id: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+    Functions: Record<never, never>
+    Enums: {
+      cafe_status: "want_to_go" | "favorite" | "hidden"
     }
-    Enums: Record<never, never>
     CompositeTypes: Record<never, never>
   }
 }
@@ -197,6 +170,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      cafe_status: ["want_to_go", "favorite", "hidden"],
+    },
   },
 } as const

@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import AutoComplete from "~/components/auto-complete/AutoComplete";
 import { ShopMarker } from "~/components/shop-marker/ShopMarker";
 import { useCoffeeShops } from "~/hooks/use-coffee.hook";
-import { useFavorites } from "~/hooks/use-favorites.hook";
 import { useGeolocation } from "~/hooks/use-location.hook";
 import { Container, Flexbox } from "~/styles/global.styles";
 import { FiltersI } from "~/types/global.type";
@@ -26,27 +25,6 @@ function Home() {
   });
 
   const { location, setLocation, getCurrentLocation } = useGeolocation();
-
-  const { isFavorite, saveFavorite, removeFavorite, isSaving, isRemoving } =
-    useFavorites();
-
-  const handleToggleFavorite = (placeId: string, name: string) => {
-    console.log(
-      "Toggle favorite - placeId:",
-      placeId,
-      "name:",
-      name,
-      "isFavorite:",
-      isFavorite(placeId)
-    );
-    if (isFavorite(placeId)) {
-      console.log("Calling removeFavorite");
-      removeFavorite(placeId);
-    } else {
-      console.log("Calling saveFavorite");
-      saveFavorite(placeId, name);
-    }
-  };
 
   const { data, isLoading } = useCoffeeShops({
     lat: location.lat,
@@ -85,14 +63,7 @@ function Home() {
           </AdvancedMarker>
 
           {data && data?.results?.length > 0 ? (
-            <ShopMarker
-              userLocation={location}
-              shops={data?.results}
-              onToggleFavorite={handleToggleFavorite}
-              isFavorite={isFavorite}
-              isSaving={isSaving}
-              isRemoving={isRemoving}
-            />
+            <ShopMarker userLocation={location} shops={data?.results} />
           ) : (
             <></>
           )}

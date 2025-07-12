@@ -4,15 +4,16 @@ export interface FiltersI {
   reviews: number;
 }
 
-export interface FindNearbyCafesP {
+export interface FindNearbyCafesI {
   lat: number;
   long: number;
   filters: FiltersI;
+  hiddenFavorites: Array<string>;
 }
 
 export interface LocationI {
-  lat: number,
-  lng: number
+  lat: number;
+  lng: number;
 }
 
 export type StringOrNull = string | null;

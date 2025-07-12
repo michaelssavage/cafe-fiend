@@ -4,8 +4,9 @@ import {
   InfoWindow,
   Pin,
 } from "@vis.gl/react-google-maps";
-import { Heart } from "lucide-react";
+import { EyeOff, Heart } from "lucide-react";
 import { useCallback, useState } from "react";
+import { useFavorites } from "~/hooks/use-favorites.hook";
 import { Flexbox } from "~/styles/global.styles";
 import { LocationI, StringOrNull } from "~/types/global.type";
 import { calculateDistance } from "~/utils/distance";
@@ -21,20 +22,9 @@ import {
 interface ShopMarkersProps {
   userLocation: LocationI;
   shops: Array<PlaceI>;
-  onToggleFavorite: (placeId: string, name: string) => void;
-  isFavorite: (placeId: string) => boolean;
-  isSaving: boolean;
-  isRemoving: boolean;
 }
 
-export const ShopMarker = ({
-  userLocation,
-  shops,
-  onToggleFavorite,
-  isFavorite,
-  isSaving,
-  isRemoving,
-}: ShopMarkersProps) => {
+export const ShopMarker = ({ userLocation, shops }: ShopMarkersProps) => {
   const data = shops.map((dataItem, index) => ({ ...dataItem, zIndex: index }));
 
   const Z_INDEX_SELECTED = data.length;
@@ -47,6 +37,16 @@ export const ShopMarker = ({
     useState<google.maps.marker.AdvancedMarkerElement | null>(null);
   const [infoWindowShown, setInfoWindowShown] = useState(false);
 
+  const {
+    isFavorite,
+    handleSaveFavorite,
+    handleRemoveFavorite,
+    handleHideCafe,
+    isSaving,
+    isRemoving,
+  } = useFavorites();
+
+  const closePopover = useCallback(() => setInfoWindowShown(false), []);
   const onMouseEnter = useCallback((id: StringOrNull) => setHoverId(id), []);
   const onMouseLeave = useCallback(() => setHoverId(null), []);
   const onMarkerClick = useCallback(
@@ -61,20 +61,38 @@ export const ShopMarker = ({
     [selectedId]
   );
 
-  const handleInfowindowCloseClick = useCallback(
-    () => setInfoWindowShown(false),
-    []
-  );
-
-  const handleToggleFavorite = useCallback(
+  const toggleFavorite = useCallback(
     (placeId: string, name: string) => {
       if (!placeId || !name) {
         console.error("Invalid placeId or name:", { placeId, name });
         return;
       }
-      onToggleFavorite(placeId, name);
+      console.log("Toggle favorite", {
+        placeId,
+        name,
+        isFavorite: isFavorite(placeId),
+      });
+      if (isFavorite(placeId)) {
+        console.log("Calling removeFavorite");
+        handleRemoveFavorite(placeId);
+      } else {
+        console.log("Calling saveFavorite");
+        handleSaveFavorite(placeId, name);
+      }
     },
-    [onToggleFavorite]
+    [isFavorite, handleRemoveFavorite, handleSaveFavorite]
+  );
+
+  const hideCafe = useCallback(
+    (placeId: string, name: string) => {
+      if (!placeId || !name) {
+        console.error("Invalid placeId or name:", { placeId, name });
+        return;
+      }
+      console.log("Hide cafe", { placeId, name });
+      handleHideCafe(placeId, name);
+    },
+    [handleHideCafe]
   );
 
   return (
@@ -141,7 +159,7 @@ export const ShopMarker = ({
               <InfoWindow
                 anchor={selectedMarker}
                 pixelOffset={[0, -2]}
-                onCloseClick={handleInfowindowCloseClick}
+                onCloseClick={closePopover}
                 style={{ padding: 0 }}
                 headerContent={shop.displayName.text}
               >
@@ -175,17 +193,20 @@ export const ShopMarker = ({
                         <Heart
                           fill={isShopFavorite ? "red" : "none"}
                           size={16}
-                          strokeWidth={1}
                         />
                       }
-                      loading={isActionDisabled}
                       onClick={() =>
-                        handleToggleFavorite(shopId, shop.displayName.text)
+                        toggleFavorite(shopId, shop.displayName.text)
                       }
                       disabled={isActionDisabled}
                       variant="primary"
+                      loading={isActionDisabled}
                     />
-                    <Button text="Hide" />
+                    <Button
+                      icon={<EyeOff size={16} />}
+                      onClick={() => hideCafe(shopId, shop.displayName.text)}
+                      disabled={isActionDisabled}
+                    />
                   </Flexbox>
                 </TitleContent>
               </InfoWindow>
