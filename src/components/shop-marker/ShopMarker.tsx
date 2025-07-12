@@ -6,8 +6,9 @@ import {
 } from "@vis.gl/react-google-maps";
 import { useCallback, useState } from "react";
 import { Flexbox } from "~/styles/global.styles";
-import { StringOrNull } from "~/types/global.type";
-import type { PlaceResult } from "../../types/place.type";
+import { LocationI, StringOrNull } from "~/types/global.type";
+import { calculateDistance } from "~/utils/distance";
+import type { PlaceI } from "../../types/place.type";
 import { Button } from "../button/Button";
 import {
   ShopRating,
@@ -17,7 +18,8 @@ import {
 } from "./ShopMarker.styles";
 
 interface ShopMarkersProps {
-  shops: Array<PlaceResult>;
+  userLocation: LocationI;
+  shops: Array<PlaceI>;
   onToggleFavorite: (placeId: string, name: string) => void;
   isFavorite: (placeId: string) => boolean;
   isSaving: boolean;
@@ -25,15 +27,14 @@ interface ShopMarkersProps {
 }
 
 export const ShopMarker = ({
+  userLocation,
   shops,
   onToggleFavorite,
   isFavorite,
   isSaving,
   isRemoving,
 }: ShopMarkersProps) => {
-  const data = shops
-    .sort((a, b) => b.geometry.location.lat - a.geometry.location.lat)
-    .map((dataItem, index) => ({ ...dataItem, zIndex: index }));
+  const data = shops.map((dataItem, index) => ({ ...dataItem, zIndex: index }));
 
   const Z_INDEX_SELECTED = data.length;
   const Z_INDEX_HOVER = data.length + 1;
@@ -78,7 +79,7 @@ export const ShopMarker = ({
   return (
     <>
       {data.map((shop) => {
-        const shopId = shop.place_id;
+        const shopId = shop.id;
 
         // Skip rendering if place_id is null or undefined
         if (!shopId) {
@@ -95,12 +96,19 @@ export const ShopMarker = ({
         }
 
         const position = {
-          lat: shop.geometry.location.lat,
-          lng: shop.geometry.location.lng,
+          lat: shop.location.latitude,
+          lng: shop.location.longitude,
         };
 
         const isShopFavorite = isFavorite(shopId);
         const isActionDisabled = isSaving || isRemoving;
+
+        const distance = calculateDistance(
+          userLocation.lat,
+          userLocation.lng,
+          shop.location.latitude,
+          shop.location.longitude
+        );
 
         return (
           <>
@@ -134,22 +142,24 @@ export const ShopMarker = ({
                 pixelOffset={[0, -2]}
                 onCloseClick={handleInfowindowCloseClick}
                 style={{ padding: 0 }}
-                headerContent={shop.name}
+                headerContent={shop.displayName.text}
               >
                 <TitleContent>
-                  <ShopVicinity>{shop.vicinity}</ShopVicinity>
+                  <ShopVicinity>
+                    {
+                      distance < 1
+                        ? `${Math.round(distance * 1000)}m` // Show meters if under 1km
+                        : `${distance.toFixed(1)}km` // Show 1 decimal for km
+                    }
+                  </ShopVicinity>
                   {shop.rating && (
                     <ShopRating>
-                      ⭐ {shop.rating} ({shop.user_ratings_total} reviews)
+                      ⭐ {shop.rating} ({shop.userRatingCount} reviews)
                     </ShopRating>
                   )}
-                  {shop.opening_hours && (
-                    <ShopStatus
-                      className={
-                        shop.opening_hours.open_now ? "open" : "closed"
-                      }
-                    >
-                      {shop.opening_hours.open_now ? "Open now" : "Closed"}
+                  {shop.currentOpeningHours && (
+                    <ShopStatus $isOpen={shop.currentOpeningHours.openNow}>
+                      {shop.currentOpeningHours.openNow ? "Open now" : "Closed"}
                     </ShopStatus>
                   )}
 
@@ -169,7 +179,9 @@ export const ShopMarker = ({
                             ? "Saving..."
                             : "Save"
                       }
-                      onClick={() => handleToggleFavorite(shopId, shop.name)}
+                      onClick={() =>
+                        handleToggleFavorite(shopId, shop.displayName.text)
+                      }
                       disabled={isActionDisabled}
                       variant={isShopFavorite ? "secondary" : "primary"}
                     />

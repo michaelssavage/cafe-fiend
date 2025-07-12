@@ -1,12 +1,10 @@
 import { createServerFn } from '@tanstack/react-start';
 import { FindNearbyCafesP } from '~/types/global.type';
-import type { PlaceResult } from "../types/place.type";
+import { fieldMask } from '~/utils/constants';
+import type { PlaceI } from "../types/place.type";
 
-// Type definitions for Google Places API response
-interface GooglePlacesResponse {
-  status: string;
-  results: Array<PlaceResult>;
-  error_message?: string;
+interface PlacesResponse {
+  places: Array<PlaceI>;
 }
 
 // Type definition for filters
@@ -16,20 +14,20 @@ interface PlaceFilters {
   reviews: number;
 }
 
-const filterResults = (results: Array<PlaceResult>, filters: PlaceFilters) => {
+const filterResults = (results: Array<PlaceI>, filters: PlaceFilters) => {
   const filteredResults = results.filter((place) => {
     // Ensure place has a valid place_id
-    if (!place.place_id) {
+    if (!place.id) {
       console.warn('Place missing place_id:', place);
       return false;
     }
     
-    const businessIsOpen = place.business_status === "OPERATIONAL" && !place.permanently_closed;
+    const businessIsOpen = place.businessStatus === "OPERATIONAL";
 
     const hasGoodRating = place.rating && place.rating > filters.rating;
     const hasEnoughReviews =
-      place.user_ratings_total &&
-      place.user_ratings_total > filters.reviews;
+      place.userRatingCount &&
+      place.userRatingCount > filters.reviews;
 
 
     return businessIsOpen && hasGoodRating && hasEnoughReviews;
@@ -91,26 +89,49 @@ export const findNearbyCoffeeShops = createServerFn({
   };
 }).handler(async ({ data }) => {
   try {
-    const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${data.latitude},${data.longitude}&radius=${data.filters.radius}&type=cafe&key=${process.env.VITE_GOOGLE_MAPS_API_KEY}`;
-    const response = await fetch(url);
+    const url = 'https://places.googleapis.com/v1/places:searchNearby';
+    
+    const requestBody = {
+      // https://developers.google.com/maps/documentation/places/web-service/place-types#table-a
+      includedTypes: ['bakery', 'cafe', 'coffee_shop', 'tea_house'],
+      maxResultCount: 20,
+      locationRestriction: {
+        circle: {
+          center: {
+            latitude: data.latitude,
+            longitude: data.longitude
+          },
+          radius: data.filters.radius
+        }
+      }
+    };
+
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string,
+        'X-Goog-FieldMask': fieldMask.join(',') 
+      },
+      body: JSON.stringify(requestBody)
+    });
     
     if (!response.ok) {
-      console.error("Google Places API error:", response.status, response.statusText);
-      throw new Error(`Google Places API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error("Google Places API error:", response.status, response.statusText, errorText);
+      throw new Error(`Google Places API error: ${response.status} - ${errorText}`);
     }
 
-    const res = await response.json() as GooglePlacesResponse;
+    const { places } = await response.json() as PlacesResponse;
+    console.log('Google Places API response:', places.length, 'places found');
 
-    if (res.status === "OK") {
-      const results = filterResults(res.results, data.filters);
-      return {
-        results, 
-        status: "OK"
-      };
-    } else {
-      console.error("Google Places API returned error status:", res.status);
-      throw new Error(`Google Places API status: ${res.status}`);
-    }
+    const results = filterResults(places, data.filters);
+
+    return {
+      results, 
+      status: "OK"
+    };
 
   } catch (error) {
     console.error("Error fetching coffee shops:", error);

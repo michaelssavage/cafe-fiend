@@ -31,14 +31,8 @@ function Home() {
     getCurrentLocation,
   } = useGeolocation();
 
-  const {
-    favorites,
-    isFavorite,
-    saveFavorite,
-    removeFavorite,
-    isSaving,
-    isRemoving,
-  } = useFavorites();
+  const { isFavorite, saveFavorite, removeFavorite, isSaving, isRemoving } =
+    useFavorites();
 
   const handleToggleFavorite = (placeId: string, name: string) => {
     console.log(
@@ -104,6 +98,7 @@ function Home() {
 
           {data && data?.results?.length > 0 ? (
             <ShopMarker
+              userLocation={location}
               shops={data?.results}
               onToggleFavorite={handleToggleFavorite}
               isFavorite={isFavorite}

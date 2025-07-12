@@ -48,19 +48,12 @@ export const ShopRating = styled.div`
   margin-bottom: 5px;
 `;
 
-export const ShopStatus = styled.div`
+export const ShopStatus = styled.div<{ $isOpen: boolean }>`
   font-size: 12px;
   font-weight: bold;
   padding: 3px 6px;
   border-radius: 4px;
 
-  &.open {
-    background-color: #e8f5e8;
-    color: #2d5a2d;
-  }
-
-  &.closed {
-    background-color: #ffeaea;
-    color: #8b0000;
-  }
+  background-color: ${({ $isOpen }) => $isOpen ? "#e8f5e8" : "#ffeaea"};
+  color: ${({ $isOpen }) => $isOpen ? "#2d5a2d" : "#8b0000"};
 `;
