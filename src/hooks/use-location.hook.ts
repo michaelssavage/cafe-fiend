@@ -9,11 +9,7 @@ const options = {
 };
 
 export const useGeolocation = () => {
-  const [location, setLocation] = useState<LocationI>({
-    ...defaultPosition,
-    accuracy: 1,
-    timestamp: 0
-  });
+  const [location, setLocation] = useState<LocationI>({ ...defaultPosition });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -30,9 +26,7 @@ export const useGeolocation = () => {
       (position) => {
         setLocation({
           lat: position.coords.latitude,
-          lng: position.coords.longitude,
-          accuracy: position.coords.accuracy,
-          timestamp: position.timestamp
+          lng: position.coords.longitude
         });
         setLoading(false);
       },
@@ -58,5 +52,5 @@ export const useGeolocation = () => {
     );
   }, []);
 
-  return { location, error, loading, getCurrentLocation };
+  return { location, setLocation, error, loading, getCurrentLocation };
 };

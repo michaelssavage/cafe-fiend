@@ -4,6 +4,7 @@ import {
   InfoWindow,
   Pin,
 } from "@vis.gl/react-google-maps";
+import { Heart } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Flexbox } from "~/styles/global.styles";
 import { LocationI, StringOrNull } from "~/types/global.type";
@@ -170,20 +171,19 @@ export const ShopMarker = ({
                     justify="flex-end"
                   >
                     <Button
-                      text={
-                        isShopFavorite
-                          ? isActionDisabled
-                            ? "Removing..."
-                            : "Remove"
-                          : isActionDisabled
-                            ? "Saving..."
-                            : "Save"
+                      icon={
+                        <Heart
+                          fill={isShopFavorite ? "red" : "none"}
+                          size={16}
+                          strokeWidth={1}
+                        />
                       }
+                      loading={isActionDisabled}
                       onClick={() =>
                         handleToggleFavorite(shopId, shop.displayName.text)
                       }
                       disabled={isActionDisabled}
-                      variant={isShopFavorite ? "secondary" : "primary"}
+                      variant="primary"
                     />
                     <Button text="Hide" />
                   </Flexbox>

@@ -1,7 +1,12 @@
+import { ReactElement } from "react";
+import { Flexbox } from "~/styles/global.styles";
+import { Spinner } from "../Spinner";
 import { StyledBtn } from "./Button.styled";
 
 interface ButtonI {
-  text: string;
+  text?: string;
+  icon?: ReactElement;
+  loading?: boolean;
   type?: "button" | "submit" | "reset" | undefined;
   onClick?: () => void;
   variant?: "primary" | "secondary";
@@ -10,7 +15,9 @@ interface ButtonI {
 
 export const Button = ({
   type = "button",
+  icon,
   text,
+  loading = false,
   disabled = false,
   variant = "primary",
   onClick,
@@ -19,10 +26,14 @@ export const Button = ({
     <StyledBtn
       type={type}
       onClick={onClick}
-      disabled={disabled}
+      disabled={disabled || loading}
       variant={variant}
+      loading={loading}
     >
-      {text}
+      {loading && <Spinner size={12} />}
+      <Flexbox id="content" direction="row">
+        {icon} {text}
+      </Flexbox>
     </StyledBtn>
   );
 };

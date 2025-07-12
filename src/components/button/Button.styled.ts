@@ -3,6 +3,7 @@ import styled from "@emotion/styled";
 
 interface BtnI {
   variant: "primary" | "secondary";
+  loading: boolean;
 }
 
 export const StyledBtn = styled.button<BtnI>`
@@ -16,16 +17,42 @@ export const StyledBtn = styled.button<BtnI>`
   background-color: #fffbfb;
   cursor: pointer;
   transition: all 0.25s;
+  display: grid;
+  place-items: center;
+  position: relative;
 
-  ${({variant}) => variant === 'secondary' && css`
-    
-    background-color: #cbf4e2;
-  `}
+  ${({ variant }) =>
+    variant === "secondary" &&
+    css`
+      background-color: #cbf4e2;
+    `}
 
   &:hover {
-  background-color: #646cff;
-  border-color: #646cff;
-  color: #fffbfb;
-}
+    background-color: #646cff;
+    border-color: #646cff;
+    color: #fffbfb;
+  }
 
-`
+  #loading-spinner,
+  #content {
+    grid-area: 1 / 1; /* Stack spinner and content in the same grid cell */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #loading-spinner {
+    visibility: hidden;
+  }
+
+  ${({ loading }) =>
+    loading && css`
+    #loading-spinner {
+      visibility: visible;
+    }
+
+    #content {
+      visibility: hidden;
+    }
+  `}
+`;

@@ -12,9 +12,7 @@ export interface FindNearbyCafesP {
 
 export interface LocationI {
   lat: number,
-  lng: number,
-  accuracy: number,
-  timestamp: number
+  lng: number
 }
 
 export type StringOrNull = string | null;

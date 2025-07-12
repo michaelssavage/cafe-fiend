@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Home03 } from "@untitled-ui/icons-react/";
 import {
   AdvancedMarker,
   Map as GoogleMap,
   Pin,
 } from "@vis.gl/react-google-maps";
+import { House } from "lucide-react";
 import { useEffect, useState } from "react";
+import AutoComplete from "~/components/auto-complete/AutoComplete";
 import { ShopMarker } from "~/components/shop-marker/ShopMarker";
 import { useCoffeeShops } from "~/hooks/use-coffee.hook";
 import { useFavorites } from "~/hooks/use-favorites.hook";
@@ -24,12 +25,7 @@ function Home() {
     reviews: 20,
   });
 
-  const {
-    location,
-    error: locationError,
-    loading,
-    getCurrentLocation,
-  } = useGeolocation();
+  const { location, setLocation, getCurrentLocation } = useGeolocation();
 
   const { isFavorite, saveFavorite, removeFavorite, isSaving, isRemoving } =
     useFavorites();
@@ -67,18 +63,8 @@ function Home() {
       <h1>Cafe Fiend</h1>
       <Flexbox direction="row" align="center" gap="1rem">
         <p>Find your next favourite coffee</p>
-        <button
-          type="button"
-          onClick={getCurrentLocation}
-          disabled={!!location || loading}
-        >
-          {loading ? "Loading..." : "Get Location"}
-        </button>
       </Flexbox>
-
-      {isLoading && <p>Loading coffee shops...</p>}
-      {locationError && <p>Failed to get user location</p>}
-      <div style={{ height: "500px" }}>
+      <div style={{ height: "80vh" }}>
         <GoogleMap
           mapId="google-maps-id"
           defaultCenter={location}
@@ -86,13 +72,15 @@ function Home() {
           gestureHandling="greedy"
           disableDefaultUI
         >
+          <AutoComplete onPlaceSelect={setLocation} isLoading={isLoading} />
+
           <AdvancedMarker position={location}>
             <Pin
               background={"#2922ff"}
               borderColor={"#2b1ea1"}
               glyphColor={"#0f237a"}
             >
-              <Home03 width={14} height={14} color="#ffffff" />
+              <House size={14} color="#ffffff" />
             </Pin>
           </AdvancedMarker>
 

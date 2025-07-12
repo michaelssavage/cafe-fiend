@@ -15,6 +15,7 @@ export interface FlexboxProps {
   width?: string;
   flex?: string;
   margin?: string;
+  visibility?: "visible" | "hidden" | "collapse";
 }
 
 export const Container = styled.div`
@@ -32,4 +33,5 @@ export const Flexbox = styled.div<FlexboxProps>`
   width: ${({ width }) => width};
   margin: ${({ margin }) => margin};
   flex: ${({ flex }) => flex};
+  visibility: ${({ visibility }) => visibility ?? "visible"};
 `;
