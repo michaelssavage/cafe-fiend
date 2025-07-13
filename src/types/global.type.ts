@@ -1,5 +1,5 @@
 export interface FiltersI {
-  rating: number;
+  rating: 4.0 | 4.4 | 4.8;
   radius: number;
   reviews: number;
 }

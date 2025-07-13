@@ -110,8 +110,10 @@ export const findNearbyCoffeeShops = createServerFn({ method: "POST" })
 
       const requestBody = {
         // https://developers.google.com/maps/documentation/places/web-service/place-types#table-a
-        includedTypes: ["bakery", "cafe", "coffee_shop", "tea_house"],
+        includedTypes: ["cafe", "cafeteria", "coffee_shop", "tea_house"],
+        excludedTypes: ["brunch_restaurant"],
         maxResultCount: 20,
+        rankPreference: "DISTANCE",
         locationRestriction: {
           circle: {
             center: {

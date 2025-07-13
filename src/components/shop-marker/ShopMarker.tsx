@@ -12,6 +12,7 @@ import { LocationI, StringOrNull } from "~/types/global.type";
 import { calculateDistance } from "~/utils/distance";
 import type { PlaceI } from "../../types/place.type";
 import { Button } from "../button/Button";
+import { heartStyles } from "../button/Button.styled";
 import {
   ShopRating,
   ShopStatus,
@@ -199,13 +200,15 @@ export const ShopMarker = ({ userLocation, shops }: ShopMarkersProps) => {
                         toggleFavorite(shopId, shop.displayName.text)
                       }
                       disabled={isActionDisabled}
-                      variant="primary"
                       loading={isActionDisabled}
+                      variant="custom"
+                      custom={heartStyles}
                     />
                     <Button
                       icon={<EyeOff size={16} />}
                       onClick={() => hideCafe(shopId, shop.displayName.text)}
                       disabled={isActionDisabled}
+                      variant="secondary"
                     />
                   </Flexbox>
                 </TitleContent>

@@ -1,7 +1,10 @@
+import { SerializedStyles } from "@emotion/react";
 import { ReactElement } from "react";
 import { Flexbox } from "~/styles/global.styles";
 import { Spinner } from "../Spinner";
 import { StyledBtn } from "./Button.styled";
+
+export type Variants = "primary" | "secondary" | "clear" | "custom";
 
 interface ButtonI {
   text?: string;
@@ -9,7 +12,8 @@ interface ButtonI {
   loading?: boolean;
   type?: "button" | "submit" | "reset" | undefined;
   onClick?: () => void;
-  variant?: "primary" | "secondary";
+  variant?: Variants;
+  custom?: SerializedStyles;
   disabled?: boolean;
 }
 
@@ -20,6 +24,7 @@ export const Button = ({
   loading = false,
   disabled = false,
   variant = "primary",
+  custom,
   onClick,
 }: ButtonI) => {
   return (
@@ -29,6 +34,7 @@ export const Button = ({
       disabled={disabled || loading}
       variant={variant}
       loading={loading}
+      custom={custom}
     >
       {loading && <Spinner size={12} />}
       <Flexbox id="content" direction="row">

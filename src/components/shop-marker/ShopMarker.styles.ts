@@ -32,7 +32,7 @@ export const ShopName = styled.div`
   font-weight: bold;
   font-size: 16px;
   margin-bottom: 5px;
-  white-space: normal; 
+  white-space: normal;
 `;
 
 export const ShopVicinity = styled.div`
@@ -54,6 +54,6 @@ export const ShopStatus = styled.div<{ $isOpen: boolean }>`
   padding: 3px 6px;
   border-radius: 4px;
 
-  background-color: ${({ $isOpen }) => $isOpen ? "#e8f5e8" : "#ffeaea"};
-  color: ${({ $isOpen }) => $isOpen ? "#2d5a2d" : "#8b0000"};
+  background-color: ${({ $isOpen }) => ($isOpen ? "#e8f5e8" : "#ffeaea")};
+  color: ${({ $isOpen }) => ($isOpen ? "#2d5a2d" : "#8b0000")};
 `;

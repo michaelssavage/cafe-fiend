@@ -9,6 +9,8 @@ import { useAutocompleteSuggestions } from "~/hooks/use-auto-complete.hook";
 import { useGeolocation } from "~/hooks/use-location.hook";
 import { Flexbox } from "~/styles/global.styles";
 import { LocationI } from "~/types/global.type";
+import { Button } from "../button/Button";
+import { SuggestionItem, SuggestionList, Wrapper } from "./AutoComplete.styled";
 
 interface Props {
   onPlaceSelect: (place: LocationI) => void;
@@ -25,7 +27,6 @@ const AutoComplete = ({ onPlaceSelect, isLoading }: Props) => {
   }, []);
 
   const {
-    location,
     error: locationError,
     loading,
     getCurrentLocation,
@@ -64,38 +65,41 @@ const AutoComplete = ({ onPlaceSelect, isLoading }: Props) => {
 
   return (
     <MapControl position={ControlPosition.TOP_LEFT}>
-      <div>
-        <Flexbox direction="row">
+      <Wrapper>
+        <Flexbox direction="row" gap="4px">
           <input
+            id="search-input"
             value={inputValue}
             onInput={(event) => handleInput(event)}
-            placeholder="Search for a place"
+            placeholder="Search for a place..."
           />
-          <button type="button" onClick={getCurrentLocation}>
-            {loading ? <LocateFixed /> : <Locate />}
-          </button>
+          <Button
+            variant="clear"
+            icon={loading ? <LocateFixed size={16} /> : <Locate size={16} />}
+            onClick={getCurrentLocation}
+          />
         </Flexbox>
 
         {isLoading && <p>Loading coffee shops...</p>}
         {locationError && <p>Failed to get user location</p>}
 
         {suggestions.length > 0 && (
-          <ul>
+          <SuggestionList>
             {suggestions.map((suggestion, index) => {
               return (
-                <li
+                <SuggestionItem
                   key={index}
                   onClick={() => {
                     handleSuggestionClick(suggestion).catch(console.error);
                   }}
                 >
                   {suggestion.placePrediction?.text.text}
-                </li>
+                </SuggestionItem>
               );
             })}
-          </ul>
+          </SuggestionList>
         )}
-      </div>
+      </Wrapper>
     </MapControl>
   );
 };
