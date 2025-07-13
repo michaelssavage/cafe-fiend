@@ -1,11 +1,12 @@
 import { FormEvent, ReactNode } from "react";
+import { Flexbox } from "~/styles/global.styles";
+import { Button } from "../button/Button";
 import {
-  Button,
+  Anchor,
   Container,
   Form,
   FormContainer,
   Input,
-  InputGroup,
   Label,
   Title,
 } from "./Auth.styled";
@@ -18,29 +19,33 @@ interface AuthI {
 }
 
 export function Auth({ actionText, onSubmit, status, afterSubmit }: AuthI) {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    onSubmit(e);
+  };
+
   return (
     <Container>
       <FormContainer>
         <Title>{actionText}</Title>
-        <Form
-          onSubmit={(e) => {
-            e.preventDefault();
-            onSubmit(e);
-          }}
-        >
-          <InputGroup>
+        <Form onSubmit={handleSubmit}>
+          <Flexbox gap="0">
             <Label htmlFor="email">Username</Label>
             <Input type="email" name="email" id="email" />
-          </InputGroup>
-          <InputGroup>
+          </Flexbox>
+          <Flexbox gap="0">
             <Label htmlFor="password">Password</Label>
             <Input type="password" name="password" id="password" />
-          </InputGroup>
-          <Button type="submit" disabled={status === "pending"}>
-            {status === "pending" ? "..." : actionText}
-          </Button>
+          </Flexbox>
+          <Button
+            type="submit"
+            disabled={status === "pending"}
+            text={status === "pending" ? "..." : actionText}
+          />
           {afterSubmit ?? null}
         </Form>
+
+        <Anchor to="/signup">No Account? Sign up</Anchor>
       </FormContainer>
     </Container>
   );

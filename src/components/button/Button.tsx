@@ -4,7 +4,7 @@ import { Flexbox } from "~/styles/global.styles";
 import { Spinner } from "../Spinner";
 import { StyledBtn } from "./Button.styled";
 
-export type Variants = "primary" | "secondary" | "clear" | "custom";
+export type Variants = "primary" | "secondary" | "clear" | "link" | "custom";
 
 interface ButtonI {
   text?: string;
@@ -33,7 +33,7 @@ export const Button = ({
       onClick={onClick}
       disabled={disabled || loading}
       variant={variant}
-      loading={loading}
+      $loading={loading}
       custom={custom}
     >
       {loading && <Spinner size={12} />}

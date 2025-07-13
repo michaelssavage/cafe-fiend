@@ -34,13 +34,19 @@ export const saveFavorite = createServerFn({ method: "POST" })
 
     const { data: result, error }: FavoriteResponse = await supabase
       .from("favorites")
-      .insert({
-        placeId: data.placeId,
-        userId: user.id,
-        name: data.name,
-        status: data.status,
-        createdAt: new Date().toISOString(),
-      })
+      .upsert(
+        {
+          placeId: data.placeId,
+          userId: user.id,
+          name: data.name,
+          status: data.status,
+          createdAt: new Date().toISOString(),
+        },
+        {
+          onConflict: "placeId,userId", // Specify the columns that define uniqueness
+          ignoreDuplicates: false, // We want to update, not ignore
+        }
+      )
       .select()
       .single();
 

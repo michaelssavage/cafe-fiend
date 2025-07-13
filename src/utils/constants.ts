@@ -10,6 +10,7 @@ export const fieldMask = [
   "places.priceLevel",
   "places.currentOpeningHours",
   "places.businessStatus",
+  "places.googleMapsUri",
 ];
 
 export const defaultPosition = { lat: 41.38879, lng: 2.15899 };

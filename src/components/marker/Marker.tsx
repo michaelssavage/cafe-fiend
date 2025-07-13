@@ -4,7 +4,7 @@ import {
   InfoWindow,
   Pin,
 } from "@vis.gl/react-google-maps";
-import { EyeOff, Heart } from "lucide-react";
+import { EyeOff, Flag, Heart } from "lucide-react";
 import { useCallback, useState } from "react";
 import { useFavorites } from "~/hooks/use-favorites.hook";
 import { Flexbox } from "~/styles/global.styles";
@@ -12,20 +12,21 @@ import { LocationI, StringOrNull } from "~/types/global.type";
 import { calculateDistance } from "~/utils/distance";
 import type { PlaceI } from "../../types/place.type";
 import { Button } from "../button/Button";
-import { heartStyles } from "../button/Button.styled";
+import { flagStyles, heartStyles, hideStyles } from "../button/Button.styled";
 import {
+  Anchor,
   ShopRating,
   ShopStatus,
   ShopVicinity,
   TitleContent,
-} from "./ShopMarker.styles";
+} from "./Marker.styled";
 
 interface ShopMarkersProps {
   userLocation: LocationI;
   shops: Array<PlaceI>;
 }
 
-export const ShopMarker = ({ userLocation, shops }: ShopMarkersProps) => {
+export const CafeMarker = ({ userLocation, shops }: ShopMarkersProps) => {
   const data = shops.map((dataItem, index) => ({ ...dataItem, zIndex: index }));
 
   const Z_INDEX_SELECTED = data.length;
@@ -40,9 +41,11 @@ export const ShopMarker = ({ userLocation, shops }: ShopMarkersProps) => {
 
   const {
     isFavorite,
+    isWishlist,
     handleSaveFavorite,
     handleRemoveFavorite,
     handleHideCafe,
+    handleAddToWishlist,
     isSaving,
     isRemoving,
   } = useFavorites();
@@ -53,35 +56,51 @@ export const ShopMarker = ({ userLocation, shops }: ShopMarkersProps) => {
   const onMarkerClick = useCallback(
     (id: StringOrNull) => {
       setSelectedId(id);
-
       if (id !== selectedId) setInfoWindowShown(true);
-      else {
-        setInfoWindowShown((isShown) => !isShown);
-      }
+      else setInfoWindowShown((isShown) => !isShown);
     },
     [selectedId]
   );
 
-  const toggleFavorite = useCallback(
-    (placeId: string, name: string) => {
+  const toggleCafe = useCallback(
+    (placeId: string, name: string, action: "favorite" | "wishlist") => {
       if (!placeId || !name) {
         console.error("Invalid placeId or name:", { placeId, name });
         return;
       }
-      console.log("Toggle favorite", {
-        placeId,
-        name,
-        isFavorite: isFavorite(placeId),
-      });
-      if (isFavorite(placeId)) {
-        console.log("Calling removeFavorite");
-        handleRemoveFavorite(placeId);
-      } else {
-        console.log("Calling saveFavorite");
-        handleSaveFavorite(placeId, name);
+
+      const isCurrentlyFavorite = isFavorite(placeId);
+      const isCurrentlyWishlist = isWishlist(placeId);
+
+      if (action === "favorite") {
+        if (isCurrentlyFavorite) {
+          // If it's already a favorite, remove it
+          console.log("Calling removeFavorite");
+          handleRemoveFavorite(placeId);
+        } else {
+          // If it's not a favorite, add it as favorite
+          console.log("Calling saveFavorite");
+          handleSaveFavorite(placeId, name);
+        }
+      } else if (action === "wishlist") {
+        if (isCurrentlyWishlist) {
+          // If it's already in wishlist, remove it
+          console.log("Calling removeWishlist");
+          handleRemoveFavorite(placeId);
+        } else {
+          // If it's not in wishlist, add it to wishlist
+          console.log("Calling handleAddToWishlist");
+          handleAddToWishlist(placeId, name);
+        }
       }
     },
-    [isFavorite, handleRemoveFavorite, handleSaveFavorite]
+    [
+      isFavorite,
+      isWishlist,
+      handleRemoveFavorite,
+      handleSaveFavorite,
+      handleAddToWishlist,
+    ]
   );
 
   const hideCafe = useCallback(
@@ -121,6 +140,7 @@ export const ShopMarker = ({ userLocation, shops }: ShopMarkersProps) => {
         };
 
         const isShopFavorite = isFavorite(shopId);
+        const isOnWishlist = isWishlist(shopId);
         const isActionDisabled = isSaving || isRemoving;
 
         const distance = calculateDistance(
@@ -130,10 +150,33 @@ export const ShopMarker = ({ userLocation, shops }: ShopMarkersProps) => {
           shop.location.longitude
         );
 
+        const getPinColors = () => {
+          if (isShopFavorite) {
+            return {
+              background: "#fcbf49",
+              borderColor: "#fcbf49",
+              glyphColor: "#e5a72c",
+            };
+          }
+
+          if (isOnWishlist) {
+            return {
+              background: "#0f9d58",
+              borderColor: "#0f9d58",
+              glyphColor: "#0d8249",
+            };
+          }
+
+          return {
+            background: "#EA4335",
+            borderColor: "#C5221F",
+            glyphColor: "#C5221F",
+          };
+        };
+
         return (
-          <>
+          <div key={shopId}>
             <AdvancedMarker
-              key={shopId}
               ref={(marker) => {
                 if (shopId === selectedId && marker) {
                   setSelectedMarker(marker);
@@ -149,11 +192,7 @@ export const ShopMarker = ({ userLocation, shops }: ShopMarkersProps) => {
               }}
               position={position}
             >
-              <Pin
-                background={isShopFavorite ? "#0f9d58" : "#EA4335"}
-                borderColor={isShopFavorite ? "#0f9d58" : "#C5221F"}
-                glyphColor={isShopFavorite ? "#0d8249" : "#C5221F"}
-              />
+              <Pin {...getPinColors()} />
             </AdvancedMarker>
 
             {selectedId === shopId && infoWindowShown && (
@@ -165,18 +204,37 @@ export const ShopMarker = ({ userLocation, shops }: ShopMarkersProps) => {
                 headerContent={shop.displayName.text}
               >
                 <TitleContent>
-                  <ShopVicinity>
-                    {
-                      distance < 1
-                        ? `${Math.round(distance * 1000)}m` // Show meters if under 1km
-                        : `${distance.toFixed(1)}km` // Show 1 decimal for km
-                    }
-                  </ShopVicinity>
-                  {shop.rating && (
-                    <ShopRating>
-                      ⭐ {shop.rating} ({shop.userRatingCount} reviews)
-                    </ShopRating>
+                  {shop.shortFormattedAddress && (
+                    <Anchor
+                      href={shop.googleMapsUri}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {shop.shortFormattedAddress}
+                    </Anchor>
                   )}
+                  <Flexbox
+                    direction="row"
+                    gap="4px"
+                    align="center"
+                    justify="space-between"
+                    margin="4px 0"
+                  >
+                    {shop.rating && (
+                      <ShopRating>
+                        ⭐ {shop.rating} ({shop.userRatingCount} reviews)
+                      </ShopRating>
+                    )}
+                    <ShopVicinity>
+                      {
+                        distance < 1
+                          ? `${Math.round(distance * 1000)}m` // Show meters if under 1km
+                          : `${distance.toFixed(1)}km` // Show 1 decimal for km
+                      }{" "}
+                      away
+                    </ShopVicinity>
+                  </Flexbox>
+
                   {shop.currentOpeningHours && (
                     <ShopStatus $isOpen={shop.currentOpeningHours.openNow}>
                       {shop.currentOpeningHours.openNow ? "Open now" : "Closed"}
@@ -197,7 +255,7 @@ export const ShopMarker = ({ userLocation, shops }: ShopMarkersProps) => {
                         />
                       }
                       onClick={() =>
-                        toggleFavorite(shopId, shop.displayName.text)
+                        toggleCafe(shopId, shop.displayName.text, "favorite")
                       }
                       disabled={isActionDisabled}
                       loading={isActionDisabled}
@@ -205,16 +263,32 @@ export const ShopMarker = ({ userLocation, shops }: ShopMarkersProps) => {
                       custom={heartStyles}
                     />
                     <Button
+                      icon={
+                        <Flag
+                          fill={isOnWishlist ? "green" : "none"}
+                          size={16}
+                        />
+                      }
+                      onClick={() =>
+                        toggleCafe(shopId, shop.displayName.text, "wishlist")
+                      }
+                      disabled={isActionDisabled}
+                      loading={isActionDisabled}
+                      variant="custom"
+                      custom={flagStyles}
+                    />
+                    <Button
                       icon={<EyeOff size={16} />}
                       onClick={() => hideCafe(shopId, shop.displayName.text)}
                       disabled={isActionDisabled}
-                      variant="secondary"
+                      variant="custom"
+                      custom={hideStyles}
                     />
                   </Flexbox>
                 </TitleContent>
               </InfoWindow>
             )}
-          </>
+          </div>
         );
       })}
     </>

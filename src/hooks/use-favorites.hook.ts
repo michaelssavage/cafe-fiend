@@ -76,6 +76,13 @@ export function useFavorites() {
     [saveMutate]
   );
 
+  const handleAddToWishlist = useCallback(
+    (placeId: string, name: string) => {
+      saveMutate({ data: { placeId, name, status: CafeStatus.WANT_TO_GO } });
+    },
+    [saveMutate]
+  );
+
   return {
     favorites,
     isLoading,
@@ -84,6 +91,7 @@ export function useFavorites() {
     handleSaveFavorite,
     handleRemoveFavorite,
     handleHideCafe,
+    handleAddToWishlist,
     isSaving,
     isRemoving,
     saveError,

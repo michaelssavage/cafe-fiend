@@ -2,9 +2,19 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { FormEvent, MouseEvent } from "react";
+import {
+  Anchor,
+  Container,
+  Form,
+  FormContainer,
+  Input,
+  Label,
+  Title,
+} from "~/components/auth/Auth.styled";
+import { Button } from "~/components/button/Button";
+import { Flexbox } from "~/styles/global.styles";
 import { loginFn } from "../functions/login.fn";
 import { signupFn } from "../functions/signup.fn";
-import { Auth } from "./auth/Auth";
 
 export function Login() {
   const router = useRouter();
@@ -19,11 +29,11 @@ export function Login() {
     },
   });
 
-  const signupMutation = useMutation({
+  const { mutate, status, data } = useMutation({
     mutationFn: useServerFn(signupFn),
   });
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.target as HTMLFormElement);
 
     loginMutation.mutate({
@@ -37,7 +47,7 @@ export function Login() {
   const signUpButton = (e: MouseEvent<HTMLButtonElement>) => {
     const formData = new FormData((e.target as HTMLButtonElement).form!);
 
-    signupMutation.mutate({
+    mutate({
       data: {
         email: formData.get("email") as string,
         password: formData.get("password") as string,
@@ -46,16 +56,12 @@ export function Login() {
   };
 
   const afterSubmit = () => {
-    if (!loginMutation.data) {
-      return null;
-    }
-
-    const { message, error } = loginMutation.data;
+    if (!data) return null;
 
     return (
       <>
-        <div>{message}</div>
-        {error && message === "Invalid login credentials" ? (
+        <div>{data.message}</div>
+        {data.error && data.message === "Invalid login credentials" ? (
           <div>
             <button onClick={signUpButton} type="button">
               Sign up instead?
@@ -67,11 +73,28 @@ export function Login() {
   };
 
   return (
-    <Auth
-      actionText="Login"
-      status={loginMutation.status}
-      onSubmit={onSubmit}
-      afterSubmit={afterSubmit()}
-    />
+    <Container>
+      <FormContainer>
+        <Title>Login</Title>
+        <Form onSubmit={handleSubmit}>
+          <Flexbox gap="0">
+            <Label htmlFor="email">Username</Label>
+            <Input type="email" name="email" id="email" />
+          </Flexbox>
+          <Flexbox gap="0">
+            <Label htmlFor="password">Password</Label>
+            <Input type="password" name="password" id="password" />
+          </Flexbox>
+          <Button
+            type="submit"
+            disabled={status === "pending"}
+            text={status === "pending" ? "..." : "Login"}
+          />
+          {afterSubmit()}
+        </Form>
+
+        <Anchor to="/signup">No Account? Sign up</Anchor>
+      </FormContainer>
+    </Container>
   );
 }

@@ -4,7 +4,7 @@ import { Variants } from "./Button";
 
 interface BtnI {
   variant: Variants;
-  loading: boolean;
+  $loading: boolean;
   custom?: SerializedStyles;
 }
 
@@ -51,13 +51,26 @@ export const StyledBtn = styled.button<BtnI>`
     if (variant === "clear") {
       return css`
         background-color: #ffffff;
-        border-color: #333333;
+        border: 1px solid #333333;
         border-radius: 50%;
         color: #333333;
         padding: 6px;
 
         &:hover {
           background-color: #f8efef;
+        }
+      `;
+    }
+
+    if (variant === "link") {
+      return css`
+        background-color: transparent;
+        border: none;
+        color: #646cff;
+        padding: 6px;
+
+        &:hover {
+          text-decoration: underline;
         }
       `;
     }
@@ -79,8 +92,8 @@ export const StyledBtn = styled.button<BtnI>`
     visibility: hidden;
   }
 
-  ${({ loading }) =>
-    loading &&
+  ${({ $loading }) =>
+    $loading &&
     css`
       #loading-spinner {
         visibility: visible;
@@ -98,5 +111,29 @@ export const heartStyles = css`
 
   &:hover {
     background-color: #f5a3a3;
+  }
+`;
+
+export const flagStyles = css`
+  background-color: #fefefe;
+  border-color: #00010c;
+
+  &:hover {
+    background-color: #a3f5b1;
+  }
+`;
+
+export const hideStyles = css`
+  color: #84a59d;
+  background-color: #fefefe;
+  border: 1px solid #84a59d;
+
+  &:hover {
+    color: #fefefe;
+    background-color: #80a1c1;
+
+    svg {
+      color: #fefefe;
+    }
   }
 `;

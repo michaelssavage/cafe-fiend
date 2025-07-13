@@ -4,11 +4,9 @@ export interface FiltersI {
   reviews: number;
 }
 
-export interface FindNearbyCafesI {
-  lat: number;
-  long: number;
-  filters: FiltersI;
-  hiddenFavorites: Array<string>;
+export interface SelectType {
+  label: string;
+  value: number;
 }
 
 export interface LocationI {
@@ -16,4 +14,13 @@ export interface LocationI {
   lng: number;
 }
 
+export interface FindNearbyCafesI {
+  lat: LocationI["lat"];
+  long: LocationI["lng"];
+  filters: FiltersI;
+  hiddenFavorites: Array<string>;
+}
+
 export type StringOrNull = string | null;
+
+export type SetState<T> = (val: T | ((prev: T) => T)) => void;

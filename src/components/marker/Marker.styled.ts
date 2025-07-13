@@ -35,17 +35,19 @@ export const ShopName = styled.div`
   white-space: normal;
 `;
 
+export const Anchor = styled.a`
+  font-size: 12px;
+`;
+
 export const ShopVicinity = styled.div`
   font-size: 12px;
   color: #666;
-  margin-bottom: 5px;
   white-space: normal;
 `;
 
 export const ShopRating = styled.div`
   font-size: 12px;
   color: #333;
-  margin-bottom: 5px;
 `;
 
 export const ShopStatus = styled.div<{ $isOpen: boolean }>`
