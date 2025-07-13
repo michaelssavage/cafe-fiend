@@ -6,6 +6,8 @@ import {
   useMatch,
   useRouter,
 } from "@tanstack/react-router";
+import { Flexbox } from "~/styles/global.styles";
+import { Button } from "./button/Button";
 
 export const ErrorBoundary = ({ error }: ErrorComponentProps) => {
   const router = useRouter();
@@ -14,8 +16,8 @@ export const ErrorBoundary = ({ error }: ErrorComponentProps) => {
     select: (state) => state.id === rootRouteId,
   });
 
-  const tryAgain = async () => {
-    await router.invalidate();
+  const tryAgain = () => {
+    void router.invalidate();
   };
 
   console.error(error);
@@ -23,14 +25,8 @@ export const ErrorBoundary = ({ error }: ErrorComponentProps) => {
   return (
     <div>
       <ErrorComponent error={error} />
-      <div>
-        <button
-          onClick={() => {
-            void tryAgain();
-          }}
-        >
-          Try Again
-        </button>
+      <Flexbox direction="row">
+        <Button onClick={tryAgain} text="Try Again" />
         {isRoot ? (
           <Link to="/">Home</Link>
         ) : (
@@ -44,7 +40,7 @@ export const ErrorBoundary = ({ error }: ErrorComponentProps) => {
             Go Back
           </Link>
         )}
-      </div>
+      </Flexbox>
     </div>
   );
 };
