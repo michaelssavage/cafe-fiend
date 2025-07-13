@@ -1,4 +1,5 @@
 import appCss from "~/styles/app.css?url";
+import { seo } from "~/utils/seo";
 
 export const Head = () => ({
   meta: [
@@ -10,6 +11,10 @@ export const Head = () => ({
       content: "width=device-width, initial-scale=1",
     },
   ],
+  ...seo({
+    title: "Cafe fiend",
+    description: `Cafe fiend is your fix for the next coffee.`,
+  }),
   links: [
     { rel: "stylesheet", href: appCss },
     {
