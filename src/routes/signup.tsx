@@ -2,6 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { FormEvent } from "react";
+import { Button } from "~/components/button/Button";
+import { signupFn } from "~/functions/signup.fn";
 import {
   Anchor,
   Container,
@@ -11,9 +13,7 @@ import {
   Input,
   Label,
   Title,
-} from "~/components/auth/Auth.styled";
-import { Button } from "~/components/button/Button";
-import { signupFn } from "~/functions/signup.fn";
+} from "~/styles/Auth.styled";
 import { Flexbox } from "~/styles/global.styles";
 
 export const Route = createFileRoute("/signup")({

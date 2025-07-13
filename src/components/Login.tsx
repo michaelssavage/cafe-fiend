@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { FormEvent, MouseEvent } from "react";
+import { Button } from "~/components/button/Button";
 import {
   Anchor,
   Container,
@@ -10,8 +11,7 @@ import {
   Input,
   Label,
   Title,
-} from "~/components/auth/Auth.styled";
-import { Button } from "~/components/button/Button";
+} from "~/styles/Auth.styled";
 import { Flexbox } from "~/styles/global.styles";
 import { loginFn } from "../functions/login.fn";
 import { signupFn } from "../functions/signup.fn";
