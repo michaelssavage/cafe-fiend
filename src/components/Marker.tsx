@@ -7,19 +7,11 @@ import {
 import { EyeOff, Flag, Heart } from "lucide-react";
 import { useCallback, useState } from "react";
 import { useFavorites } from "~/hooks/use-favorites.hook";
-import { Flexbox } from "~/styles/global.styles";
+import { Flexbox } from "~/styles/Flexbox";
 import { LocationI, StringOrNull } from "~/types/global.type";
 import { calculateDistance } from "~/utils/distance";
-import type { PlaceI } from "../../types/place.type";
-import { Button } from "../button/Button";
-import { flagStyles, heartStyles, hideStyles } from "../button/Button.styled";
-import {
-  Anchor,
-  ShopRating,
-  ShopStatus,
-  ShopVicinity,
-  TitleContent,
-} from "./Marker.styled";
+import type { PlaceI } from "../types/place.type";
+import { Button, flagStyles, heartStyles, hideStyles } from "./Button";
 
 interface ShopMarkersProps {
   userLocation: LocationI;
@@ -203,15 +195,16 @@ export const CafeMarker = ({ userLocation, shops }: ShopMarkersProps) => {
                 style={{ padding: 0 }}
                 headerContent={shop.displayName.text}
               >
-                <TitleContent>
+                <div className="font-bold text-sm">
                   {shop.shortFormattedAddress && (
-                    <Anchor
+                    <a
                       href={shop.googleMapsUri}
                       target="_blank"
                       rel="noopener noreferrer"
+                      className="text-xs text-blue-600 underline"
                     >
                       {shop.shortFormattedAddress}
-                    </Anchor>
+                    </a>
                   )}
                   <Flexbox
                     direction="row"
@@ -221,24 +214,28 @@ export const CafeMarker = ({ userLocation, shops }: ShopMarkersProps) => {
                     margin="4px 0"
                   >
                     {shop.rating && (
-                      <ShopRating>
+                      <div className="text-xs text-gray-800">
                         ⭐ {shop.rating} ({shop.userRatingCount} reviews)
-                      </ShopRating>
+                      </div>
                     )}
-                    <ShopVicinity>
-                      {
-                        distance < 1
-                          ? `${Math.round(distance * 1000)}m` // Show meters if under 1km
-                          : `${distance.toFixed(1)}km` // Show 1 decimal for km
-                      }{" "}
+                    <div className="text-xs text-gray-600">
+                      {distance < 1
+                        ? `${Math.round(distance * 1000)}m`
+                        : `${distance.toFixed(1)}km`}{" "}
                       away
-                    </ShopVicinity>
+                    </div>
                   </Flexbox>
 
                   {shop.currentOpeningHours && (
-                    <ShopStatus $isOpen={shop.currentOpeningHours.openNow}>
+                    <div
+                      className={`text-xs font-bold rounded px-2 py-1 mt-1 inline-block ${
+                        shop.currentOpeningHours.openNow
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
                       {shop.currentOpeningHours.openNow ? "Open now" : "Closed"}
-                    </ShopStatus>
+                    </div>
                   )}
 
                   <Flexbox
@@ -285,7 +282,7 @@ export const CafeMarker = ({ userLocation, shops }: ShopMarkersProps) => {
                       custom={hideStyles}
                     />
                   </Flexbox>
-                </TitleContent>
+                </div>
               </InfoWindow>
             )}
           </div>

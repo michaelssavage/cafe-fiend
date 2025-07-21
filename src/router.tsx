@@ -1,6 +1,6 @@
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 import { ErrorBoundary } from "./components/ErrorBoundary";
-import { NotFound } from "./components/NotFound";
+import { NotFound } from "./components/atoms/NotFound";
 import { routeTree } from "./routeTree.gen";
 
 export function createRouter() {

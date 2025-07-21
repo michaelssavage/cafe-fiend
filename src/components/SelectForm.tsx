@@ -7,7 +7,7 @@ import Select, {
   SingleValue,
   StylesConfig,
 } from "react-select";
-import { Flexbox } from "~/styles/global.styles";
+import { Flexbox } from "~/styles/Flexbox";
 
 interface SelectI<T> {
   id: string;

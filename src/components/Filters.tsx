@@ -1,10 +1,10 @@
 import { useCallback } from "react";
 import { SingleValue } from "react-select";
-import { Flexbox } from "~/styles/global.styles";
+import { Flexbox } from "~/styles/Flexbox";
 import { FiltersI, SelectType, SetState } from "~/types/global.type";
 import { RATING_OPTIONS, REVIEWS_OPTIONS } from "~/utils/constants";
-import { SelectForm } from "../form/SelectForm";
-import { Trackbar } from "../track-bar/Trackbar";
+import { SelectForm } from "./SelectForm";
+import { Trackbar } from "./Trackbar";
 
 interface FiltersComponentI {
   filters: FiltersI;

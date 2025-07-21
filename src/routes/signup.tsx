@@ -1,64 +1,137 @@
-import { useMutation } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
-import { FormEvent } from "react";
-import { Button } from "~/components/button/Button";
-import { signupFn } from "~/functions/signup.fn";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import { Button } from "~/components/Button";
 import {
-  Anchor,
-  Container,
-  Error,
-  Form,
-  FormContainer,
-  Input,
-  Label,
-  Title,
-} from "~/styles/Auth.styled";
-import { Flexbox } from "~/styles/global.styles";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { getSupabaseClient } from "~/lib/supabase/client";
 
 export const Route = createFileRoute("/signup")({
-  component: SignupComp,
+  component: SignUp,
 });
 
-function SignupComp() {
-  const { mutate, status, data } = useMutation({
-    mutationFn: useServerFn(signupFn),
-  });
+function SignUp() {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [repeatPassword, setRepeatPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    const formData = new FormData(e.target as HTMLFormElement);
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const supabase = getSupabaseClient();
+    setError(null);
 
-    mutate({
-      data: {
-        email: formData.get("email") as string,
-        password: formData.get("password") as string,
-      },
-    });
+    if (password !== repeatPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            full_name: fullName,
+          },
+        },
+      });
+      if (error) throw error;
+      await navigate({ to: "/signup-success" });
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : "An error occurred");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <Container>
-      <FormContainer>
-        <Title>Sign Up</Title>
-        <Form onSubmit={handleSubmit}>
-          <Flexbox gap="0">
-            <Label htmlFor="email">Username</Label>
-            <Input type="email" name="email" id="email" />
-          </Flexbox>
-          <Flexbox gap="0">
-            <Label htmlFor="password">Password</Label>
-            <Input type="password" name="password" id="password" />
-          </Flexbox>
-          <Button
-            type="submit"
-            disabled={status === "pending"}
-            text={status === "pending" ? "..." : "Sign up"}
-          />
-          {data?.error ? <Error>{data.message}</Error> : null}
-        </Form>
-
-        <Anchor to="/login">Have an Account? Login</Anchor>
-      </FormContainer>
-    </Container>
+    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+      <div className="w-full max-w-sm">
+        <div className="flex flex-col gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Sign up</CardTitle>
+              <CardDescription>Create a new account</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={(e) => void handleSignUp(e)}>
+                <div className="flex flex-col gap-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="full-name">Full Name</Label>
+                    <Input
+                      id="full-name"
+                      type="text"
+                      placeholder="John Doe"
+                      required
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="m@example.com"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <div className="flex items-center">
+                      <Label htmlFor="password">Password</Label>
+                    </div>
+                    <Input
+                      id="password"
+                      type="password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <div className="flex items-center">
+                      <Label htmlFor="repeat-password">Repeat Password</Label>
+                    </div>
+                    <Input
+                      id="repeat-password"
+                      type="password"
+                      required
+                      value={repeatPassword}
+                      onChange={(e) => setRepeatPassword(e.target.value)}
+                    />
+                  </div>
+                  {error && <p className="text-sm text-red-500">{error}</p>}
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    text={isLoading ? "Creating an account..." : "Sign up"}
+                  />
+                </div>
+                <div className="mt-4 text-center text-sm">
+                  Already have an account?{" "}
+                  <Link to="/login" className="underline underline-offset-4">
+                    Login
+                  </Link>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
   );
 }

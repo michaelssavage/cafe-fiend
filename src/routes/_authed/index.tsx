@@ -6,12 +6,11 @@ import {
 } from "@vis.gl/react-google-maps";
 import { House } from "lucide-react";
 import { useEffect, useState } from "react";
-import AutoComplete from "~/components/auto-complete/AutoComplete";
-import { Filters } from "~/components/filters/Filters";
-import { CafeMarker } from "~/components/marker/Marker";
+import AutoComplete from "~/components/AutoComplete";
+import { Filters } from "~/components/Filters";
+import { CafeMarker } from "~/components/Marker";
 import { useCoffeeShops } from "~/hooks/use-coffee.hook";
 import { useGeolocation } from "~/hooks/use-location.hook";
-import { Container } from "~/styles/global.styles";
 import { FiltersI } from "~/types/global.type";
 
 export const Route = createFileRoute("/_authed/")({
@@ -38,7 +37,7 @@ function Home() {
   }, [getCurrentLocation]);
 
   return (
-    <Container>
+    <div className="max-w-[900px] mx-auto">
       <h1>Cafe Fiend</h1>
       <p>Find your next favourite coffee:</p>
       <Filters filters={filters} setFilters={setFilters} />
@@ -70,6 +69,6 @@ function Home() {
           )}
         </GoogleMap>
       </div>
-    </Container>
+    </div>
   );
 }

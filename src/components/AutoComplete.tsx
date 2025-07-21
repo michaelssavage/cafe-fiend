@@ -7,10 +7,9 @@ import { Locate, LocateFixed } from "lucide-react";
 import React, { FormEvent, useCallback, useState } from "react";
 import { useAutocompleteSuggestions } from "~/hooks/use-auto-complete.hook";
 import { useGeolocation } from "~/hooks/use-location.hook";
-import { Flexbox } from "~/styles/global.styles";
+import { Flexbox } from "~/styles/Flexbox";
 import { LocationI } from "~/types/global.type";
-import { Button } from "../button/Button";
-import { SuggestionItem, SuggestionList, Wrapper } from "./AutoComplete.styled";
+import { Button } from "./Button";
 
 interface Props {
   onPlaceSelect: (place: LocationI) => void;
@@ -65,13 +64,14 @@ const AutoComplete = ({ onPlaceSelect, isLoading }: Props) => {
 
   return (
     <MapControl position={ControlPosition.TOP_LEFT}>
-      <Wrapper>
+      <div className="my-2 mx-1">
         <Flexbox direction="row" gap="4px">
           <input
             id="search-input"
             value={inputValue}
             onInput={(event) => handleInput(event)}
             placeholder="Search for a place..."
+            className="rounded border border-gray-800 focus:border-indigo-500 px-2 py-1 w-full"
           />
           <Button
             variant="clear"
@@ -84,22 +84,21 @@ const AutoComplete = ({ onPlaceSelect, isLoading }: Props) => {
         {locationError && <p>Failed to get user location</p>}
 
         {suggestions.length > 0 && (
-          <SuggestionList>
-            {suggestions.map((suggestion, index) => {
-              return (
-                <SuggestionItem
-                  key={index}
-                  onClick={() => {
-                    handleSuggestionClick(suggestion).catch(console.error);
-                  }}
-                >
-                  {suggestion.placePrediction?.text.text}
-                </SuggestionItem>
-              );
-            })}
-          </SuggestionList>
+          <ul className="bg-white border border-gray-800 list-none p-2 rounded mt-2">
+            {suggestions.map((suggestion, index) => (
+              <li
+                key={index}
+                onClick={() => {
+                  handleSuggestionClick(suggestion).catch(console.error);
+                }}
+                className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded"
+              >
+                {suggestion.placePrediction?.text.text}
+              </li>
+            ))}
+          </ul>
         )}
-      </Wrapper>
+      </div>
     </MapControl>
   );
 };

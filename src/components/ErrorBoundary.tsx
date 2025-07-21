@@ -6,8 +6,8 @@ import {
   useMatch,
   useRouter,
 } from "@tanstack/react-router";
-import { Flexbox } from "~/styles/global.styles";
-import { Button } from "./button/Button";
+import { Flexbox } from "~/styles/Flexbox";
+import { Button } from "./Button";
 
 export const ErrorBoundary = ({ error }: ErrorComponentProps) => {
   const router = useRouter();
@@ -23,9 +23,9 @@ export const ErrorBoundary = ({ error }: ErrorComponentProps) => {
   console.error(error);
 
   return (
-    <div>
+    <div className="max-w-[900px] mx-auto mt-8">
       <ErrorComponent error={error} />
-      <Flexbox direction="row">
+      <Flexbox direction="row" align="center">
         <Button onClick={tryAgain} text="Try Again" />
         {isRoot ? (
           <Link to="/">Home</Link>

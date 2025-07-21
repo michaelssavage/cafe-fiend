@@ -1,6 +1,6 @@
 import type { PostgrestError } from "@supabase/supabase-js";
 import { createServerFn } from "@tanstack/react-start";
-import { getSupabaseServerClient } from "~/lib/supabase";
+import { getSupabaseServerClient } from "~/lib/supabase/supabase";
 
 import { Database } from "~/types/supabase.type";
 import { CafeStatus } from "~/utils/constants";

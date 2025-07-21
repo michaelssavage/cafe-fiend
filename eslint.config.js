@@ -21,6 +21,7 @@ export default tseslint.config([
     rules: {
       "@typescript-eslint/no-unused-vars": "warn",
       "@typescript-eslint/array-type": ["error", { default: "generic" }],
+      "@typescript-eslint/only-throw-error": "off",
     },
     languageOptions: {
       ecmaVersion: 2020,

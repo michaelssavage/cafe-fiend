@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ReactNode } from "react";
-import { Flexbox } from "~/styles/global.styles";
-import { Button } from "./button/Button";
+import { Flexbox } from "~/styles/Flexbox";
+import { Button } from "../Button";
 
 export function NotFound({ children }: { children?: ReactNode }) {
   return (

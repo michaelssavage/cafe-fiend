@@ -7,18 +7,31 @@ import {
   createRootRoute,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { createServerFn } from "@tanstack/react-start";
 import { APIProvider } from "@vis.gl/react-google-maps";
-import * as React from "react";
+import { Head } from "~/components/atoms/Head";
+import { NotFound } from "~/components/atoms/NotFound";
 import { ErrorBoundary } from "~/components/ErrorBoundary";
-import { Head } from "~/components/Head";
-import { Navbar } from "~/components/navbar/Navbar";
-import { NotFound } from "~/components/NotFound.js";
-import { fetchUser } from "~/functions/fetch-user.fn";
+import { Navbar } from "~/components/Navbar";
+import { ThemeProvider } from "~/context/theme-provider.context";
+import { getSupabaseClient } from "~/lib/supabase/client";
+import { getSupabaseServerClient } from "~/lib/supabase/server";
+import { RootUserI } from "~/types/user.type";
 
 const queryClient = new QueryClient();
-const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+const fetchUserFn = createServerFn({ method: "GET" }).handler(async () => {
+  const supabase = getSupabaseServerClient();
+  const { data } = await supabase.auth.getUser();
+
+  if (!data.user?.email) return null;
+
+  return {
+    email: data.user.email,
+  };
+});
+
+function RootDocument({ children, user }: RootUserI) {
   return (
     <html>
       <head>
@@ -28,7 +41,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         {children}
         <TanStackRouterDevtools position="top-right" />
         <Scripts />
-        <Navbar />
+        <Navbar user={user} />
       </body>
     </html>
   );
@@ -36,25 +49,43 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 
 export const Route = createRootRoute({
   beforeLoad: async () => {
-    const user = await fetchUser();
+    let user = await fetchUserFn();
+
+    // If no server-side user, check client-side (for fresh logins)
+    if (!user && typeof window !== "undefined") {
+      const supabase = getSupabaseClient();
+      const { data } = await supabase.auth.getUser();
+      if (data.user?.email) {
+        user = { email: data.user.email };
+      }
+    }
+
     return { user };
   },
   head: Head,
   notFoundComponent: () => <NotFound />,
   errorComponent: (props) => {
     return (
-      <RootDocument>
+      <RootDocument user={null}>
         <ErrorBoundary {...props} />
       </RootDocument>
     );
   },
-  component: () => (
-    <QueryClientProvider client={queryClient}>
-      <APIProvider apiKey={key}>
-        <RootDocument>
-          <Outlet />
-        </RootDocument>
-      </APIProvider>
-    </QueryClientProvider>
-  ),
+  component: function RootComponent() {
+    const { user } = Route.useRouteContext();
+
+    return (
+      <QueryClientProvider client={queryClient}>
+        <APIProvider
+          apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string}
+        >
+          <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+            <RootDocument user={user}>
+              <Outlet />
+            </RootDocument>
+          </ThemeProvider>
+        </APIProvider>
+      </QueryClientProvider>
+    );
+  },
 });
