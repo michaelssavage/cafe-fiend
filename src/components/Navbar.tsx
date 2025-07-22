@@ -1,4 +1,5 @@
 import { Link, useRouter } from "@tanstack/react-router";
+import { getSupabaseClient } from "~/lib/supabase/client";
 import { Flexbox } from "~/styles/Flexbox";
 import { UserI } from "~/types/user.type";
 import { Button } from "./Button";
@@ -6,8 +7,10 @@ import { Button } from "./Button";
 export const Navbar = ({ user }: { user: UserI }) => {
   const router = useRouter();
 
-  const handleLogout = () => {
-    void router.navigate({ to: "/logout" });
+  const handleLogout = async () => {
+    const supabase = getSupabaseClient();
+    await supabase.auth.signOut();
+    await router.navigate({ to: "/" });
   };
 
   return (
@@ -16,17 +19,22 @@ export const Navbar = ({ user }: { user: UserI }) => {
         direction="row"
         align="center"
         justify="space-between"
-        gap="4px"
         width="100%"
       >
-        <Flexbox direction="row" align="center" gap="4px">
+        <Flexbox direction="row" align="center">
           <Link to="/" className="text-blue-600 hover:underline">
             Home
           </Link>
           {/* // link */}
         </Flexbox>
 
-        {user && <Button variant="link" text="Logout" onClick={handleLogout} />}
+        {user && (
+          <Button
+            variant="link"
+            text="Logout"
+            onClick={() => void handleLogout()}
+          />
+        )}
       </Flexbox>
     </nav>
   );

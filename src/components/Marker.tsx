@@ -208,7 +208,6 @@ export const CafeMarker = ({ userLocation, shops }: ShopMarkersProps) => {
                   )}
                   <Flexbox
                     direction="row"
-                    gap="4px"
                     align="center"
                     justify="space-between"
                     margin="4px 0"
@@ -238,12 +237,7 @@ export const CafeMarker = ({ userLocation, shops }: ShopMarkersProps) => {
                     </div>
                   )}
 
-                  <Flexbox
-                    direction="row"
-                    margin="6px 0 0"
-                    gap="4px"
-                    justify="flex-end"
-                  >
+                  <Flexbox direction="row" margin="mt-4" justify="flex-end">
                     <Button
                       icon={
                         <Heart

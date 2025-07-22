@@ -40,7 +40,7 @@ export const Button = ({
     secondary:
       "bg-indigo-500 border border-transparent text-white hover:bg-white hover:text-indigo-500 hover:border-indigo-500",
     clear:
-      "bg-white border border-gray-800 rounded-full text-gray-800 px-2 py-1 hover:bg-gray-100",
+      "bg-white border border-gray-800 rounded-full text-gray-800 p-1 hover:bg-gray-100",
     link: "bg-transparent border-none text-indigo-500 hover:underline px-2 py-1",
     custom: custom,
   };

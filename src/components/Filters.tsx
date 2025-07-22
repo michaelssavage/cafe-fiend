@@ -30,7 +30,7 @@ export const Filters = ({ filters, setFilters }: FiltersComponentI) => {
   );
 
   return (
-    <Flexbox direction="row" gap="1rem" margin="1rem 0">
+    <Flexbox direction="row" margin="my-2">
       <SelectForm<SelectType | undefined>
         id="review-select"
         label="Reviews"

@@ -65,13 +65,13 @@ const AutoComplete = ({ onPlaceSelect, isLoading }: Props) => {
   return (
     <MapControl position={ControlPosition.TOP_LEFT}>
       <div className="my-2 mx-1">
-        <Flexbox direction="row" gap="4px">
+        <Flexbox direction="row">
           <input
             id="search-input"
             value={inputValue}
             onInput={(event) => handleInput(event)}
             placeholder="Search for a place..."
-            className="rounded border border-gray-800 focus:border-indigo-500 px-2 py-1 w-full"
+            className="bg-white rounded border border-gray-800 focus:border-indigo-500 px-2 py-1 w-full"
           />
           <Button
             variant="clear"
