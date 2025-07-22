@@ -27,8 +27,8 @@ function Home() {
   const { location, setLocation, getCurrentLocation } = useGeolocation();
 
   const { data, isLoading } = useCoffeeShops({
-    lat: location.lat,
-    long: location.lng,
+    lat: location?.lat,
+    long: location?.lng,
     filters,
   });
 
@@ -38,36 +38,42 @@ function Home() {
 
   return (
     <div className="max-w-[900px] mx-auto">
-      <h1>Cafe Fiend</h1>
-      <p>Find your next favourite coffee:</p>
+      <h1 className="py-4">Cafe Fiend</h1>
+      <p className="pb-2 text-lg">Find your next favourite coffee</p>
       <Filters filters={filters} setFilters={setFilters} />
 
       <div style={{ height: "80vh" }}>
-        <GoogleMap
-          mapId="google-maps-id"
-          defaultCenter={location}
-          defaultZoom={13}
-          gestureHandling="greedy"
-          disableDefaultUI
-        >
-          <AutoComplete onPlaceSelect={setLocation} isLoading={isLoading} />
+        {location ? (
+          <GoogleMap
+            mapId="google-maps-id"
+            defaultCenter={location}
+            defaultZoom={13}
+            gestureHandling="greedy"
+            disableDefaultUI
+          >
+            <AutoComplete onPlaceSelect={setLocation} isLoading={isLoading} />
 
-          <AdvancedMarker position={location}>
-            <Pin
-              background={"#2922ff"}
-              borderColor={"#2b1ea1"}
-              glyphColor={"#0f237a"}
-            >
-              <House size={14} color="#ffffff" />
-            </Pin>
-          </AdvancedMarker>
+            <AdvancedMarker position={location}>
+              <Pin
+                background={"#2922ff"}
+                borderColor={"#2b1ea1"}
+                glyphColor={"#0f237a"}
+              >
+                <House size={14} color="#ffffff" />
+              </Pin>
+            </AdvancedMarker>
 
-          {data && data?.results?.length > 0 ? (
-            <CafeMarker userLocation={location} shops={data?.results} />
-          ) : (
-            <></>
-          )}
-        </GoogleMap>
+            {data && data?.results?.length > 0 ? (
+              <CafeMarker userLocation={location} shops={data?.results} />
+            ) : (
+              <></>
+            )}
+          </GoogleMap>
+        ) : (
+          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+            Loading map...
+          </div>
+        )}
       </div>
     </div>
   );

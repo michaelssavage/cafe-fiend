@@ -6,3 +6,8 @@ export interface RootUserI {
   children: ReactNode;
   user: UserI;
 }
+
+export interface LoginUserI {
+  email: string;
+  password: string;
+}

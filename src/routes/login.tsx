@@ -1,5 +1,7 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { FormEvent, useState } from "react";
 import { Button } from "~/components/Button";
 import {
   Card,
@@ -10,7 +12,30 @@ import {
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { getSupabaseClient } from "~/lib/supabase/client";
+import { getSupabaseServerClient } from "~/lib/supabase/server";
+import { LoginUserI } from "~/types/user.type";
+
+const loginFn = createServerFn({ method: "POST" })
+  .validator((d: LoginUserI) => {
+    if (!d.email || !d.password) {
+      throw new Error("Invalid login data");
+    }
+    return d;
+  })
+  .handler(async ({ data }) => {
+    const supabase = getSupabaseServerClient();
+    const { error } = await supabase.auth.signInWithPassword({
+      email: data.email,
+      password: data.password,
+    });
+
+    if (error) {
+      return {
+        error: true,
+        message: error.message,
+      };
+    }
+  });
 
 export const Route = createFileRoute("/login")({
   component: Login,
@@ -19,30 +44,19 @@ export const Route = createFileRoute("/login")({
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+  const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const { mutate, error, isPending } = useMutation({
+    mutationFn: loginFn,
+    onSuccess: async () => {
+      await router.invalidate();
+      void router.navigate({ to: "/" });
+    },
+  });
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const supabase = getSupabaseClient();
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) throw error;
-
-      await navigate({ to: "/" });
-    } catch (error: unknown) {
-      console.error("Login or navigation error:", error);
-      setError(error instanceof Error ? error.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
+    mutate({ data: { email, password } });
   };
 
   return (
@@ -57,7 +71,7 @@ function Login() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={(e) => void handleLogin(e)}>
+              <form onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-6">
                   <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
@@ -88,11 +102,15 @@ function Login() {
                       onChange={(e) => setPassword(e.target.value)}
                     />
                   </div>
-                  {error && <p className="text-sm text-red-500">{error}</p>}
+                  {error && (
+                    <p className="text-sm text-red-500">
+                      {error.message || "An error occurred during login"}
+                    </p>
+                  )}
                   <Button
                     type="submit"
-                    disabled={isLoading}
-                    text={isLoading ? "Logging in..." : "Login"}
+                    disabled={isPending}
+                    text={isPending ? "Logging in..." : "Login"}
                   />
                 </div>
                 <div className="mt-4 text-center text-sm">

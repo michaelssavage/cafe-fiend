@@ -1,5 +1,4 @@
 import { useCallback, useState } from "react";
-import { defaultPosition } from "~/utils/constants";
 import type { LocationI } from "../types/global.type";
 
 const options = {
@@ -9,7 +8,7 @@ const options = {
 };
 
 export const useGeolocation = () => {
-  const [location, setLocation] = useState<LocationI>({ ...defaultPosition });
+  const [location, setLocation] = useState<LocationI | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 

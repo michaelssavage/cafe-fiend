@@ -1,4 +1,4 @@
-import appCss from "~/styles/app.css?url";
+import appCss from "~/styles/globals.css?url";
 import { seo } from "~/utils/seo";
 
 export const Head = () => ({

@@ -15,8 +15,8 @@ export interface LocationI {
 }
 
 export interface FindNearbyCafesI {
-  lat: LocationI["lat"];
-  long: LocationI["lng"];
+  lat?: LocationI["lat"];
+  long?: LocationI["lng"];
   filters: FiltersI;
   hiddenFavorites: Array<string>;
 }
