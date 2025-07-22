@@ -25,7 +25,7 @@ export const Flexbox: React.FC<FlexboxProps> = ({
   justify,
   align,
   wrap,
-  gap = "gap-2",
+  gap = "gap-1",
   width,
   flex,
   margin,

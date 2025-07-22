@@ -60,7 +60,7 @@ export const SelectForm = <T,>({
 }: SelectI<T>) => {
   return (
     <Flexbox direction="row" align="center">
-      {label && <label htmlFor={id}>{label}: </label>}
+      {label && <label htmlFor={id}>{label}</label>}
       <Select
         inputId={id}
         value={value}

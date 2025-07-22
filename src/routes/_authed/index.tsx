@@ -22,6 +22,7 @@ function Home() {
     rating: 4.0,
     radius: 2000,
     reviews: 20,
+    showFavorites: false,
   });
 
   const { location, setLocation, getCurrentLocation } = useGeolocation();

@@ -4,6 +4,7 @@ import { Flexbox } from "~/styles/Flexbox";
 import { FiltersI, SelectType, SetState } from "~/types/global.type";
 import { RATING_OPTIONS, REVIEWS_OPTIONS } from "~/utils/constants";
 import { SelectForm } from "./SelectForm";
+import ToggleSwitch from "./ToggleSwitch";
 import { Trackbar } from "./Trackbar";
 
 interface FiltersComponentI {
@@ -29,8 +30,15 @@ export const Filters = ({ filters, setFilters }: FiltersComponentI) => {
     [setFilters]
   );
 
+  const handleToggle = useCallback(
+    (key: string, v: boolean) => {
+      setFilters((prev: FiltersI) => ({ ...prev, [key]: v }));
+    },
+    [setFilters]
+  );
+
   return (
-    <Flexbox direction="row" margin="my-2">
+    <Flexbox direction="row" margin="my-2" gap="gap-4">
       <SelectForm<SelectType | undefined>
         id="review-select"
         label="Reviews"
@@ -52,6 +60,14 @@ export const Filters = ({ filters, setFilters }: FiltersComponentI) => {
         label="Distance"
         value={filters.radius}
         onValueChange={(val) => handleSlider("radius", val[0])}
+      />
+
+      <ToggleSwitch
+        text="Show Favorites"
+        onChange={(val) => handleToggle("favo", val)}
+        value={filters.showFavorites}
+        onColor="bg-green-500"
+        offColor="bg-gray-300"
       />
     </Flexbox>
   );
