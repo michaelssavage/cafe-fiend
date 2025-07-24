@@ -55,34 +55,39 @@ export const CafeMarker = ({ userLocation, shops }: ShopMarkersProps) => {
   );
 
   const toggleCafe = useCallback(
-    (placeId: string, name: string, action: "favorite" | "wishlist") => {
-      if (!placeId || !name) {
-        console.error("Invalid placeId or name:", { placeId, name });
+    (shop: PlaceI, action: "favorite" | "wishlist") => {
+      if (!shop.id || !shop.displayName.text) {
+        console.error("toggleCafe:Invalid placeId or name:", {
+          placeId: shop.id,
+          name: shop.displayName.text,
+        });
         return;
       }
 
-      const isCurrentlyFavorite = isFavorite(placeId);
-      const isCurrentlyWishlist = isWishlist(placeId);
+      const isCurrentlyFavorite = isFavorite(shop.id);
+      const isCurrentlyWishlist = isWishlist(shop.id);
 
       if (action === "favorite") {
         if (isCurrentlyFavorite) {
-          // If it's already a favorite, remove it
-          console.log("Calling removeFavorite");
-          handleRemoveFavorite(placeId);
+          console.log(
+            "removeFavorite: already a favorite, removing it",
+            shop.id
+          );
+          handleRemoveFavorite(shop.id);
         } else {
-          // If it's not a favorite, add it as favorite
-          console.log("Calling saveFavorite");
-          handleSaveFavorite(placeId, name);
+          console.log("saveFavorite: not a favorite, add it as favorite");
+          handleSaveFavorite(shop);
         }
       } else if (action === "wishlist") {
         if (isCurrentlyWishlist) {
-          // If it's already in wishlist, remove it
-          console.log("Calling removeWishlist");
-          handleRemoveFavorite(placeId);
+          console.log(
+            "removeWishlist: already in wishlist, remove it",
+            shop.id
+          );
+          handleRemoveFavorite(shop.id);
         } else {
-          // If it's not in wishlist, add it to wishlist
-          console.log("Calling handleAddToWishlist");
-          handleAddToWishlist(placeId, name);
+          console.log("addToWishlist:not in wishlist, add it to wishlist");
+          handleAddToWishlist(shop);
         }
       }
     },
@@ -96,13 +101,19 @@ export const CafeMarker = ({ userLocation, shops }: ShopMarkersProps) => {
   );
 
   const hideCafe = useCallback(
-    (placeId: string, name: string) => {
-      if (!placeId || !name) {
-        console.error("Invalid placeId or name:", { placeId, name });
+    (shop: PlaceI) => {
+      if (!shop.id || !shop.displayName.text) {
+        console.error("hideCafe:Invalid placeId or name:", {
+          placeId: shop.id,
+          name: shop.displayName.text,
+        });
         return;
       }
-      console.log("Hide cafe", { placeId, name });
-      handleHideCafe(placeId, name);
+      console.log("Hide cafe", {
+        placeId: shop.id,
+        name: shop.displayName.text,
+      });
+      handleHideCafe(shop);
     },
     [handleHideCafe]
   );
@@ -245,9 +256,7 @@ export const CafeMarker = ({ userLocation, shops }: ShopMarkersProps) => {
                           size={16}
                         />
                       }
-                      onClick={() =>
-                        toggleCafe(shopId, shop.displayName.text, "favorite")
-                      }
+                      onClick={() => toggleCafe(shop, "favorite")}
                       disabled={isActionDisabled}
                       loading={isActionDisabled}
                       variant="custom"
@@ -260,9 +269,7 @@ export const CafeMarker = ({ userLocation, shops }: ShopMarkersProps) => {
                           size={16}
                         />
                       }
-                      onClick={() =>
-                        toggleCafe(shopId, shop.displayName.text, "wishlist")
-                      }
+                      onClick={() => toggleCafe(shop, "wishlist")}
                       disabled={isActionDisabled}
                       loading={isActionDisabled}
                       variant="custom"
@@ -270,7 +277,7 @@ export const CafeMarker = ({ userLocation, shops }: ShopMarkersProps) => {
                     />
                     <Button
                       icon={<EyeOff size={16} />}
-                      onClick={() => hideCafe(shopId, shop.displayName.text)}
+                      onClick={() => hideCafe(shop)}
                       disabled={isActionDisabled}
                       variant="custom"
                       custom={hideStyles}

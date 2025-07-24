@@ -4,9 +4,9 @@ export type Json =
   | boolean
   | null
   | { [key: string]: Json | undefined }
-  | Array<Json>;
+  | Json[];
 
-export interface Database {
+export type Database = {
   // Allows to automatically instanciate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
@@ -14,42 +14,99 @@ export interface Database {
   };
   public: {
     Tables: {
-      favorites: {
+      profiles: {
         Row: {
-          createdAt: string | null;
-          id: number;
-          name: string | null;
-          placeId: string;
-          status: Database["public"]["Enums"]["cafe_status"] | null;
-          userId: string | null;
+          created_at: string | null;
+          full_name: string | null;
+          id: string;
+          updated_at: string | null;
         };
         Insert: {
-          createdAt?: string | null;
-          id?: number;
-          name?: string | null;
-          placeId: string;
-          status?: Database["public"]["Enums"]["cafe_status"] | null;
-          userId?: string | null;
+          created_at?: string | null;
+          full_name?: string | null;
+          id: string;
+          updated_at?: string | null;
         };
         Update: {
-          createdAt?: string | null;
+          created_at?: string | null;
+          full_name?: string | null;
+          id?: string;
+          updated_at?: string | null;
+        };
+        Relationships: [];
+      };
+      saved: {
+        Row: {
+          business_status: string | null;
+          created_at: string | null;
+          google_maps_uri: string | null;
+          id: number;
+          latitude: number;
+          longitude: number;
+          name: string;
+          place_id: string;
+          price_level: number | null;
+          rating: number | null;
+          short_formatted_address: string | null;
+          status: string;
+          updated_at: string | null;
+          user_id: string;
+          user_rating_count: number | null;
+          vicinity: string | null;
+        };
+        Insert: {
+          business_status?: string | null;
+          created_at?: string | null;
+          google_maps_uri?: string | null;
           id?: number;
-          name?: string | null;
-          placeId?: string;
-          status?: Database["public"]["Enums"]["cafe_status"] | null;
-          userId?: string | null;
+          latitude: number;
+          longitude: number;
+          name: string;
+          place_id: string;
+          price_level?: number | null;
+          rating?: number | null;
+          short_formatted_address?: string | null;
+          status: string;
+          updated_at?: string | null;
+          user_id: string;
+          user_rating_count?: number | null;
+          vicinity?: string | null;
+        };
+        Update: {
+          business_status?: string | null;
+          created_at?: string | null;
+          google_maps_uri?: string | null;
+          id?: number;
+          latitude?: number;
+          longitude?: number;
+          name?: string;
+          place_id?: string;
+          price_level?: number | null;
+          rating?: number | null;
+          short_formatted_address?: string | null;
+          status?: string;
+          updated_at?: string | null;
+          user_id?: string;
+          user_rating_count?: number | null;
+          vicinity?: string | null;
         };
         Relationships: [];
       };
     };
-    Views: Record<never, never>;
-    Functions: Record<never, never>;
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      [_ in never]: never;
+    };
     Enums: {
       cafe_status: "want_to_go" | "favorite" | "hidden";
     };
-    CompositeTypes: Record<never, never>;
+    CompositeTypes: {
+      [_ in never]: never;
+    };
   };
-}
+};
 
 type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
 

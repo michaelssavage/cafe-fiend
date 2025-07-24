@@ -20,6 +20,7 @@ export enum CafeStatus {
   WANT_TO_GO = "want_to_go",
   HIDDEN = "hidden",
 }
+
 export const REVIEWS_OPTIONS = [
   { value: 20, label: "20+" },
   { value: 100, label: "100+" },

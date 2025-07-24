@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { getFavorites, removeFavorite, saveFavorite } from "~/api/favorites";
+import { PlaceI } from "~/types/place.type";
 import { CafeStatus } from "~/utils/constants";
 
 export function useFavorites() {
@@ -37,8 +38,8 @@ export function useFavorites() {
   });
 
   const handleSaveFavorite = useCallback(
-    (placeId: string, name: string) => {
-      saveMutate({ data: { placeId, name, status: CafeStatus.FAVORITE } });
+    (shop: PlaceI) => {
+      saveMutate({ data: { status: CafeStatus.FAVORITE, shop } });
     },
     [saveMutate]
   );
@@ -54,7 +55,9 @@ export function useFavorites() {
   const isFavorite = useCallback(
     (placeId: string) => {
       return favorites.some(
-        (fav) => fav.placeId === placeId && fav.status === CafeStatus.FAVORITE
+        (fav) =>
+          fav.place_id === placeId &&
+          fav.status === (CafeStatus.FAVORITE as string)
       );
     },
     [favorites]
@@ -63,22 +66,24 @@ export function useFavorites() {
   const isWishlist = useCallback(
     (placeId: string) => {
       return favorites.some(
-        (fav) => fav.placeId === placeId && fav.status === CafeStatus.WANT_TO_GO
+        (fav) =>
+          fav.place_id === placeId &&
+          fav.status === (CafeStatus.WANT_TO_GO as string)
       );
     },
     [favorites]
   );
 
   const handleHideCafe = useCallback(
-    (placeId: string, name: string) => {
-      saveMutate({ data: { placeId, name, status: CafeStatus.HIDDEN } });
+    (shop: PlaceI) => {
+      saveMutate({ data: { status: CafeStatus.HIDDEN, shop } });
     },
     [saveMutate]
   );
 
   const handleAddToWishlist = useCallback(
-    (placeId: string, name: string) => {
-      saveMutate({ data: { placeId, name, status: CafeStatus.WANT_TO_GO } });
+    (shop: PlaceI) => {
+      saveMutate({ data: { status: CafeStatus.WANT_TO_GO, shop } });
     },
     [saveMutate]
   );

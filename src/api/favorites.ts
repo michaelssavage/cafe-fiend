@@ -1,11 +1,12 @@
 import type { PostgrestError } from "@supabase/supabase-js";
 import { createServerFn } from "@tanstack/react-start";
 import { getSupabaseServerClient } from "~/lib/supabase/server";
+import { PlaceI } from "~/types/place.type";
 
 import { Database } from "~/types/supabase.type";
 import { CafeStatus } from "~/utils/constants";
 
-export type Favorite = Database["public"]["Tables"]["favorites"]["Row"];
+export type Favorite = Database["public"]["Tables"]["saved"]["Row"];
 
 interface FavoriteResponse {
   data: Favorite | null;
@@ -13,8 +14,8 @@ interface FavoriteResponse {
 }
 
 export const saveFavorite = createServerFn({ method: "POST" })
-  .validator((data: { placeId: string; name: string; status: CafeStatus }) => {
-    if (!data.placeId || !data.name || !data.status) {
+  .validator((data: { status: CafeStatus; shop: PlaceI }) => {
+    if (!data.shop.displayName.text || !data.shop.id || !data.status) {
       throw new Error("placeId and name are required");
     }
     return data;
@@ -39,17 +40,26 @@ export const saveFavorite = createServerFn({ method: "POST" })
     }
 
     const { data: result, error }: FavoriteResponse = await supabase
-      .from("favorites")
+      .from("saved")
       .upsert(
         {
-          placeId: data.placeId,
-          userId: user.id,
-          name: data.name,
+          user_id: user.id,
           status: data.status,
-          createdAt: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          place_id: data.shop.id,
+          name: data.shop.displayName.text,
+          latitude: data.shop.location.latitude,
+          longitude: data.shop.location.longitude,
+          rating: data.shop.rating,
+          user_rating_count: data.shop.userRatingCount,
+          price_level: data.shop.priceLevel,
+          vicinity: data.shop.formattedAddress,
+          business_status: data.shop.businessStatus,
+          google_maps_uri: data.shop.googleMapsUri,
+          short_formatted_address: data.shop.shortFormattedAddress,
         },
         {
-          onConflict: "placeId,userId", // Specify the columns that define uniqueness
+          onConflict: "place_id,user_id", // define uniqueness
           ignoreDuplicates: false, // We want to update, not ignore
         }
       )
@@ -89,19 +99,19 @@ export const removeFavorite = createServerFn({ method: "POST" })
 
     // First, let's check if the record exists
     const { data: existingRecord, error: selectError } = await supabase
-      .from("favorites")
+      .from("saved")
       .select("*")
-      .eq("placeId", data.placeId)
-      .eq("userId", user.id);
+      .eq("place_id", data.placeId)
+      .eq("user_id", user.id);
 
     console.log("Existing record:", existingRecord);
     console.log("Select error:", selectError);
 
     const { data: deleteResult, error } = await supabase
-      .from("favorites")
+      .from("saved")
       .delete()
-      .eq("placeId", data.placeId)
-      .eq("userId", user.id)
+      .eq("place_id", data.placeId)
+      .eq("user_id", user.id)
       .select();
 
     console.log("Delete result:", deleteResult);
@@ -135,10 +145,10 @@ export const getFavorites = createServerFn({ method: "GET" }).handler(
     }
 
     const { data, error } = await supabase
-      .from("favorites")
+      .from("saved")
       .select("*")
-      .eq("userId", user.id)
-      .order("createdAt", { ascending: false });
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
 
     if (error) {
       console.error("Supabase fetch favorites error:", error.message);

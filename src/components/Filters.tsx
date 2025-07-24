@@ -64,7 +64,7 @@ export const Filters = ({ filters, setFilters }: FiltersComponentI) => {
 
       <ToggleSwitch
         text="Show Favorites"
-        onChange={(val) => handleToggle("favo", val)}
+        onChange={(val) => handleToggle("showFavorites", val)}
         value={filters.showFavorites}
         onColor="bg-green-500"
         offColor="bg-gray-300"

@@ -7,6 +7,13 @@ interface LocalizedTextI {
   languageCode: string;
 }
 
+type PriceLevelI =
+  | "PRICE_LEVEL_FREE"
+  | "PRICE_LEVEL_INEXPENSIVE"
+  | "PRICE_LEVEL_MODERATE"
+  | "PRICE_LEVEL_EXPENSIVE"
+  | "PRICE_LEVEL_VERY_EXPENSIVE";
+
 // https://developers.google.com/maps/documentation/places/web-service/reference/rest/v1/places#Place
 
 export interface PlaceI {
@@ -25,12 +32,20 @@ export interface PlaceI {
   types: Array<string>;
   rating?: number;
   userRatingCount?: number;
-  priceLevel?:
-    | "PRICE_LEVEL_FREE"
-    | "PRICE_LEVEL_INEXPENSIVE"
-    | "PRICE_LEVEL_MODERATE"
-    | "PRICE_LEVEL_EXPENSIVE"
-    | "PRICE_LEVEL_VERY_EXPENSIVE";
+  priceLevel?: PriceLevelI;
   currentOpeningHours?: { openNow: boolean };
   businessStatus?: "OPERATIONAL" | "CLOSED_TEMPORARILY" | "CLOSED_PERMANENTLY";
+}
+
+export interface EnrichedPlaceI extends PlaceI {
+  place_id?: string;
+  isFavorite?: boolean;
+  isWishlist?: boolean;
+  source?: "nearby" | "favorite";
+}
+
+export interface CoffeeShopsResponse {
+  results: Array<EnrichedPlaceI>;
+  status: string;
+  next_page_token?: string;
 }
