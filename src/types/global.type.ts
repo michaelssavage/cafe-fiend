@@ -30,13 +30,8 @@ export type StringOrNull = string | null;
 
 export type SetState<T> = (val: T | ((prev: T) => T)) => void;
 
-// Server-specific types that use arrays instead of Sets
-export interface FiltersServerI {
-  rating: 4.0 | 4.4 | 4.8;
-  radius: number;
-  reviews: number;
-  options: Array<OptionsI>;
-}
+// Server-specific types dont include options
+export type FiltersServerI = Omit<FiltersI, "options">;
 
 export interface CafeListsI {
   hiddenCafes: Array<string>;

@@ -23,10 +23,31 @@ export const useGeolocation = () => {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setLocation({
+        const newLocation = {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
-        });
+        };
+
+        console.log("Geolocation success:", newLocation);
+
+        if (isNaN(newLocation.lat) || isNaN(newLocation.lng)) {
+          setError("Invalid coordinates received");
+          setLoading(false);
+          return;
+        }
+
+        if (
+          newLocation.lat < -90 ||
+          newLocation.lat > 90 ||
+          newLocation.lng < -180 ||
+          newLocation.lng > 180
+        ) {
+          setError("Coordinates out of valid range");
+          setLoading(false);
+          return;
+        }
+
+        setLocation(newLocation);
         setLoading(false);
       },
       (err) => {

@@ -44,17 +44,14 @@ function Home() {
         {location ? (
           <GoogleMap
             mapId="google-maps-id"
-            defaultCenter={location}
+            center={location}
             defaultZoom={13}
             gestureHandling="greedy"
             disableDefaultUI
           >
             <AutoComplete onPlaceSelect={setLocation} isLoading={isLoading} />
 
-            <DraggableAdvancedMarker
-              position={location}
-              onDragEnd={setLocation}
-            />
+            <DraggableAdvancedMarker position={location} onDragEnd={setLocation} />
 
             <CafeMarker userLocation={location} shops={data} />
           </GoogleMap>

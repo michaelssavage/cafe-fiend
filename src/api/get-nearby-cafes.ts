@@ -69,7 +69,6 @@ export const findNearbyCafes = createServerFn({ method: "POST" })
       reviews: data.filters?.reviews
         ? parseInt(data.filters.reviews.toString(), 10)
         : 10,
-      options: data.filters?.options || [],
     };
 
     if (filters.rating < 0 || filters.rating > 5) {

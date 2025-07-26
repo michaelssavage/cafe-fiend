@@ -6,7 +6,7 @@ import { Spinner } from "./atoms/Spinner";
 export const heartStyles = "bg-white border border-black hover:bg-red-200";
 export const flagStyles = "bg-white border border-black hover:bg-green-200";
 export const hideStyles =
-  "text-teal-500 bg-white border border-teal-500 hover:text-white hover:bg-blue-400 [&_svg]:hover:text-white";
+  "text-pink-500 bg-white border border-pink-500 hover:text-white hover:bg-pink-400 [&_svg]:hover:text-white";
 
 export type Variants = "primary" | "secondary" | "clear" | "link" | "custom";
 
@@ -39,24 +39,15 @@ export const Button = ({
       "bg-white border border-indigo-500 text-indigo-500 hover:bg-indigo-500 hover:text-white",
     secondary:
       "bg-indigo-500 border border-transparent text-white hover:bg-white hover:text-indigo-500 hover:border-indigo-500",
-    clear:
-      "bg-white border border-gray-800 rounded-full text-gray-800 p-1 hover:bg-gray-100",
+    clear: "bg-white border border-gray-800 rounded-full text-gray-800 p-1 hover:bg-gray-100",
     link: "bg-transparent border-none text-indigo-500 hover:underline px-2 py-1",
     custom: custom,
   };
 
-  const finalClass = clsx(
-    base,
-    variant !== "custom" ? variants[variant] : custom
-  );
+  const finalClass = clsx(base, variant !== "custom" ? variants[variant] : custom);
 
   return (
-    <button
-      type={type}
-      onClick={onClick}
-      disabled={disabled || loading}
-      className={finalClass}
-    >
+    <button type={type} onClick={onClick} disabled={disabled || loading} className={finalClass}>
       {loading ? (
         <Spinner size={12} />
       ) : (

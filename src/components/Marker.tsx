@@ -69,7 +69,7 @@ export const CafeMarker = ({ userLocation, shops }: ShopMarkersProps) => {
       if (id !== selectedId) setInfoWindowShown(true);
       else setInfoWindowShown((isShown) => !isShown);
     },
-    [selectedId]
+    [selectedId],
   );
 
   const toggleCafe = useCallback(
@@ -87,10 +87,7 @@ export const CafeMarker = ({ userLocation, shops }: ShopMarkersProps) => {
 
       if (action === "favorite") {
         if (isCurrentlyFavorite) {
-          console.log(
-            "removeFavorite: already a favorite, removing it",
-            shop.id
-          );
+          console.log("removeFavorite: already a favorite, removing it", shop.id);
           store.handleRemoveFavorite(shop.id);
         } else {
           console.log("saveFavorite: not a favorite, add it as favorite");
@@ -98,10 +95,7 @@ export const CafeMarker = ({ userLocation, shops }: ShopMarkersProps) => {
         }
       } else if (action === "wishlist") {
         if (isCurrentlyWishlist) {
-          console.log(
-            "removeWishlist: already in wishlist, remove it",
-            shop.id
-          );
+          console.log("removeWishlist: already in wishlist, remove it", shop.id);
           store.handleRemoveFavorite(shop.id);
         } else {
           console.log("addToWishlist:not in wishlist, add it to wishlist");
@@ -109,7 +103,7 @@ export const CafeMarker = ({ userLocation, shops }: ShopMarkersProps) => {
         }
       }
     },
-    [store]
+    [store],
   );
 
   const hideCafe = useCallback(
@@ -127,7 +121,7 @@ export const CafeMarker = ({ userLocation, shops }: ShopMarkersProps) => {
       });
       store.handleHideCafe(shop);
     },
-    [store]
+    [store],
   );
 
   if (!shops || shops.length === 0) {
@@ -165,8 +159,10 @@ export const CafeMarker = ({ userLocation, shops }: ShopMarkersProps) => {
       userLocation.lat,
       userLocation.lng,
       shop.location.latitude,
-      shop.location.longitude
+      shop.location.longitude,
     );
+
+    const km = distance < 1 ? `${Math.round(distance * 1000)}m` : `${distance.toFixed(1)}km`;
 
     return (
       <div key={shopId}>
@@ -219,12 +215,7 @@ export const CafeMarker = ({ userLocation, shops }: ShopMarkersProps) => {
                     ⭐ {shop.rating} ({shop.userRatingCount} reviews)
                   </div>
                 )}
-                <div className="text-xs text-gray-600">
-                  {distance < 1
-                    ? `${Math.round(distance * 1000)}m`
-                    : `${distance.toFixed(1)}km`}{" "}
-                  away
-                </div>
+                <div className="text-xs text-gray-600">{`${km} away`}</div>
               </Flexbox>
 
               {shop.currentOpeningHours && (
@@ -241,9 +232,7 @@ export const CafeMarker = ({ userLocation, shops }: ShopMarkersProps) => {
 
               <Flexbox direction="row" margin="mt-4" justify="justify-end">
                 <Button
-                  icon={
-                    <Heart fill={isShopFavorite ? "red" : "none"} size={16} />
-                  }
+                  icon={<Heart fill={isShopFavorite ? "red" : "none"} size={16} />}
                   onClick={() => toggleCafe(shop, "favorite")}
                   disabled={isFavoriteDisabled}
                   loading={store.isSavingFavorite}
@@ -251,9 +240,7 @@ export const CafeMarker = ({ userLocation, shops }: ShopMarkersProps) => {
                   custom={heartStyles}
                 />
                 <Button
-                  icon={
-                    <Flag fill={isOnWishlist ? "green" : "none"} size={16} />
-                  }
+                  icon={<Flag fill={isOnWishlist ? "green" : "none"} size={16} />}
                   onClick={() => toggleCafe(shop, "wishlist")}
                   disabled={isWishlistDisabled}
                   loading={store.isSavingWishlist}
