@@ -5,10 +5,13 @@ import { createRoot, Root } from "react-dom/client";
 
 interface DraggableAdvancedMarkerProps {
   position: google.maps.LatLngLiteral;
-  onDragEnd: (position: google.maps.LatLngLiteral) => void;
+  setLocation: (position: google.maps.LatLngLiteral) => void;
 }
 
-export const DraggableAdvancedMarker = ({ position, onDragEnd }: DraggableAdvancedMarkerProps) => {
+export const DraggableAdvancedMarker = ({
+  position,
+  setLocation,
+}: DraggableAdvancedMarkerProps) => {
   const map = useMap();
   const markerLibrary = useMapsLibrary("marker");
 
@@ -16,11 +19,11 @@ export const DraggableAdvancedMarker = ({ position, onDragEnd }: DraggableAdvanc
   const containerRef = useRef<HTMLDivElement | null>(null);
   const rootRef = useRef<Root | null>(null);
   const listenerRef = useRef<google.maps.MapsEventListener | null>(null);
-  const onDragEndRef = useRef(onDragEnd);
+  const onDragEndRef = useRef(setLocation);
 
   useEffect(() => {
-    onDragEndRef.current = onDragEnd;
-  }, [onDragEnd]);
+    onDragEndRef.current = setLocation;
+  }, [setLocation]);
 
   const cleanup = useCallback(() => {
     if (listenerRef.current) {

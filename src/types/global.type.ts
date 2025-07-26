@@ -2,8 +2,10 @@ import { PlaceI } from "./place.type";
 
 export type OptionsI = "nearby" | "favorites" | "wishlist";
 
+export type RatingEnum = 4.0 | 4.4 | 4.8;
+
 export interface FiltersI {
-  rating: 4.0 | 4.4 | 4.8;
+  rating: RatingEnum;
   radius: number;
   reviews: number;
   options: Set<OptionsI>;

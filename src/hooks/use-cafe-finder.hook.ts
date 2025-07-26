@@ -7,7 +7,7 @@ import { CafeStatus } from "~/utils/constants";
 import { transformFavoriteToPlace } from "~/utils/transform";
 import { useFavorites } from "./use-favorites.hook";
 
-export const useCoffeeShops = ({
+export const useCafeFinder = ({
   lat,
   long,
   filters,

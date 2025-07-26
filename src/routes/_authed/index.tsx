@@ -5,7 +5,7 @@ import AutoComplete from "~/components/AutoComplete";
 import { DraggableAdvancedMarker } from "~/components/DraggableMarker";
 import { Filters } from "~/components/Filters";
 import { CafeMarker } from "~/components/Marker";
-import { useCoffeeShops } from "~/hooks/use-coffee.hook";
+import { useCafeFinder } from "~/hooks/use-cafe-finder.hook";
 import { useGeolocation } from "~/hooks/use-location.hook";
 import { FiltersI } from "~/types/global.type";
 
@@ -25,7 +25,7 @@ function Home() {
 
   const { location, setLocation, getCurrentLocation } = useGeolocation();
 
-  const { data, isLoading } = useCoffeeShops({
+  const { data, isLoading } = useCafeFinder({
     lat: location?.lat,
     long: location?.lng,
     filters,
@@ -57,7 +57,7 @@ function Home() {
           >
             <AutoComplete onPlaceSelect={setLocation} isLoading={isLoading} />
 
-            <DraggableAdvancedMarker position={location} onDragEnd={setLocation} />
+            <DraggableAdvancedMarker position={location} setLocation={setLocation} />
 
             <CafeMarker userLocation={location} shops={data} />
           </GoogleMap>
