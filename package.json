@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build && tsc --noEmit",
-    "start": "vite start"
+    "start": "vite start",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.7",

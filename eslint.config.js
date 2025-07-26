@@ -22,6 +22,8 @@ export default tseslint.config([
       "@typescript-eslint/no-unused-vars": "warn",
       "@typescript-eslint/array-type": ["error", { default: "generic" }],
       "@typescript-eslint/only-throw-error": "off",
+      "react-refresh/only-export-components": "warn",
+      "@typescript-eslint/non-nullable-type-assertion-style": "warn",
     },
     languageOptions: {
       ecmaVersion: 2020,

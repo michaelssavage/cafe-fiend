@@ -2,7 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { findNearbyCoffeeShops } from "~/api/get-nearby-cafes";
 import { FindNearbyCafesI } from "~/types/global.type";
+import { PlaceI } from "~/types/place.type";
 import { CafeStatus } from "~/utils/constants";
+import { transformFavoriteToPlace } from "~/utils/transform";
 import { useFavorites } from "./use-favorites.hook";
 
 export const useCoffeeShops = ({
@@ -12,25 +14,31 @@ export const useCoffeeShops = ({
 }: Omit<FindNearbyCafesI, "hiddenFavorites">) => {
   const { favorites } = useFavorites();
 
-  const hiddenFavorites = favorites
-    .filter((favorite) => favorite.status === (CafeStatus.HIDDEN as string))
-    .map((favorite) => favorite.place_id);
+  const { hiddenFavorites, favoriteCafes, wishlistCafes } = useMemo(() => {
+    const hidden = favorites
+      .filter((favorite) => favorite.status === (CafeStatus.HIDDEN as string))
+      .map((favorite) => favorite.place_id);
 
-  // Get favorite place IDs
-  const favoritePlaceIds = useMemo(
-    () =>
-      favorites
-        .filter((fav) => fav.status === (CafeStatus.FAVORITE as string))
-        .map((fav) => fav.place_id),
-    [favorites]
-  );
+    const favoriteShops = favorites
+      .filter((favorite) => favorite.status === (CafeStatus.FAVORITE as string))
+      .map(transformFavoriteToPlace);
 
-  console.log("favorite place IDs", {
-    numFavs: favoritePlaceIds.length,
-    showFavorites: filters.showFavorites,
-  });
+    const wishlistShops = favorites
+      .filter(
+        (favorite) => favorite.status === (CafeStatus.WANT_TO_GO as string)
+      )
+      .map(transformFavoriteToPlace);
 
-  return useQuery({
+    return {
+      hiddenFavorites: hidden,
+      favoriteCafes: favoriteShops,
+      wishlistCafes: wishlistShops,
+    };
+  }, [favorites]);
+
+  const shouldFetchNearby = filters.options.has("nearby");
+
+  const { data, isLoading, error } = useQuery({
     queryKey: ["coffeeShops", lat, long, filters, hiddenFavorites],
     queryFn: () =>
       findNearbyCoffeeShops({
@@ -41,7 +49,47 @@ export const useCoffeeShops = ({
           hiddenFavorites,
         },
       }),
-    enabled: !!(lat && long),
+    enabled: !!(lat && long) && shouldFetchNearby,
     refetchOnWindowFocus: false,
   });
+
+  const displayData = useMemo(() => {
+    const results: Array<PlaceI> = [];
+    const addedPlaceIds = new Set<string>();
+
+    if (filters.options.has("nearby") && data) {
+      data.results.forEach((cafe) => {
+        if (!addedPlaceIds.has(cafe.id)) {
+          results.push({ ...cafe, source: "nearby" });
+          addedPlaceIds.add(cafe.id);
+        }
+      });
+    }
+
+    if (filters.options.has("favorites")) {
+      favoriteCafes.forEach((cafe) => {
+        if (cafe.id && !addedPlaceIds.has(cafe.id)) {
+          results.push({ ...cafe, source: "favorites" });
+          addedPlaceIds.add(cafe.id);
+        }
+      });
+    }
+
+    if (filters.options.has("wishlist")) {
+      wishlistCafes.forEach((cafe) => {
+        if (cafe.id && !addedPlaceIds.has(cafe.id)) {
+          results.push({ ...cafe, source: "wishlist" });
+          addedPlaceIds.add(cafe.id);
+        }
+      });
+    }
+
+    return results;
+  }, [filters.options, data, favoriteCafes, wishlistCafes]);
+
+  return {
+    data: displayData,
+    isLoading: shouldFetchNearby ? isLoading : false,
+    error,
+  };
 };

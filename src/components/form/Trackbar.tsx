@@ -23,9 +23,13 @@ export const Trackbar = ({
   className,
 }: SliderProps) => {
   return (
-    <div className={cn("flex flex-row items-center gap-1", className)}>
-      {label && <label htmlFor={id}>{label}:</label>}
-      <div className="flex flex-row items-center gap-2.5 border border-gray-300 rounded h-[30px] px-1">
+    <div className={cn("flex flex-col gap-1", className)}>
+      {label && (
+        <label htmlFor={id} className="text-xs">
+          {label}
+        </label>
+      )}
+      <div className="flex flex-row items-center gap-2.5 border border-gray-300 bg-white rounded h-[30px] px-2">
         <span>{min / 1000}km</span>
         <Root
           min={min}

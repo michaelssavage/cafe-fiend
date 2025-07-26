@@ -36,11 +36,11 @@ export default function ToggleSwitch({
   };
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="ml-auto flex flex-row items-center gap-1">
       {text && (
         <label
           className={cn(
-            "text-sm font-medium",
+            "text-xs",
             disabled ? "text-gray-400" : "text-gray-900"
           )}
         >
@@ -57,7 +57,7 @@ export default function ToggleSwitch({
         onClick={handleToggle}
         onKeyDown={handleKeyDown}
         className={cn(
-          "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
+          "cursor-pointer relative inline-flex h-6 w-15 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none",
           isOn ? onColor : offColor,
           disabled && "opacity-50 cursor-not-allowed"
         )}
@@ -65,7 +65,7 @@ export default function ToggleSwitch({
         <span
           className={cn(
             "inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition-transform duration-200 ease-in-out",
-            isOn ? "translate-x-6" : "translate-x-1"
+            isOn ? "translate-x-10" : "translate-x-1"
           )}
         />
       </button>

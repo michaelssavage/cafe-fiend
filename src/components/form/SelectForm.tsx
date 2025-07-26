@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import Select, {
   ActionMeta,
   CSSObjectWithLabel,
@@ -58,19 +59,36 @@ export const SelectForm = <T,>({
   onChange,
   styles,
 }: SelectI<T>) => {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   return (
-    <Flexbox direction="row" align="center">
-      {label && <label htmlFor={id}>{label}</label>}
-      <Select
-        inputId={id}
-        value={value}
-        options={options}
-        onChange={onChange}
-        styles={{
-          ...baseStyles,
-          ...styles,
-        }}
-      />
+    <Flexbox direction="col">
+      {label && (
+        <label htmlFor={id} className="text-xs">
+          {label}
+        </label>
+      )}
+      {isMounted ? (
+        <Select
+          inputId={id}
+          instanceId={id}
+          value={value}
+          options={options}
+          onChange={onChange}
+          styles={{
+            ...baseStyles,
+            ...styles,
+          }}
+        />
+      ) : (
+        <div className="h-[30px] border rounded bg-white flex items-center px-2 text-sm text-gray-500">
+          Loading...
+        </div>
+      )}
     </Flexbox>
   );
 };

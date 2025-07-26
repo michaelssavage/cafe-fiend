@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Button } from "~/components/ui/button";
+import { Button } from "~/components/Button";
 import {
   Card,
   CardContent,
@@ -66,9 +66,12 @@ function UpdatePassword() {
                     />
                   </div>
                   {error && <p className="text-sm text-red-500">{error}</p>}
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Saving..." : "Save new password"}
-                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    text="Save new password"
+                    loading={isLoading}
+                  />
                 </div>
               </form>
             </CardContent>

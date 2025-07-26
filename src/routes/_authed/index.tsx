@@ -1,12 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import {
-  AdvancedMarker,
-  Map as GoogleMap,
-  Pin,
-} from "@vis.gl/react-google-maps";
-import { House } from "lucide-react";
+import { Map as GoogleMap } from "@vis.gl/react-google-maps";
 import { useEffect, useState } from "react";
 import AutoComplete from "~/components/AutoComplete";
+import { DraggableAdvancedMarker } from "~/components/DraggableMarker";
 import { Filters } from "~/components/Filters";
 import { CafeMarker } from "~/components/Marker";
 import { useCoffeeShops } from "~/hooks/use-coffee.hook";
@@ -22,7 +18,7 @@ function Home() {
     rating: 4.0,
     radius: 2000,
     reviews: 20,
-    showFavorites: false,
+    options: new Set(["nearby"]),
   });
 
   const { location, setLocation, getCurrentLocation } = useGeolocation();
@@ -41,6 +37,7 @@ function Home() {
     <div className="max-w-[900px] mx-auto">
       <h1 className="py-4">Cafe Fiend</h1>
       <p className="pb-2 text-lg">Find your next favourite coffee</p>
+
       <Filters filters={filters} setFilters={setFilters} />
 
       <div style={{ height: "80vh" }}>
@@ -54,21 +51,12 @@ function Home() {
           >
             <AutoComplete onPlaceSelect={setLocation} isLoading={isLoading} />
 
-            <AdvancedMarker position={location}>
-              <Pin
-                background={"#2922ff"}
-                borderColor={"#2b1ea1"}
-                glyphColor={"#0f237a"}
-              >
-                <House size={14} color="#ffffff" />
-              </Pin>
-            </AdvancedMarker>
+            <DraggableAdvancedMarker
+              position={location}
+              onDragEnd={setLocation}
+            />
 
-            {data && data?.results?.length > 0 ? (
-              <CafeMarker userLocation={location} shops={data?.results} />
-            ) : (
-              <></>
-            )}
+            <CafeMarker userLocation={location} shops={data} />
           </GoogleMap>
         ) : (
           <div className="w-full h-full bg-gray-200 flex items-center justify-center">

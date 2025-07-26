@@ -1,3 +1,5 @@
+import { OptionsI } from "./global.type";
+
 export interface GooglePlacesI {
   places: Array<PlaceI>;
 }
@@ -14,14 +16,16 @@ type PriceLevelI =
   | "PRICE_LEVEL_EXPENSIVE"
   | "PRICE_LEVEL_VERY_EXPENSIVE";
 
+export type BusinessStatusI =
+  | "OPERATIONAL"
+  | "CLOSED_TEMPORARILY"
+  | "CLOSED_PERMANENTLY";
+
 // https://developers.google.com/maps/documentation/places/web-service/reference/rest/v1/places#Place
 
 export interface PlaceI {
-  id: string; // This is the place identifier
+  id: string;
   displayName: LocalizedTextI;
-  editorialSummary: LocalizedTextI;
-  generativeSummary: { overview: LocalizedTextI };
-  reviewSummary: { text: LocalizedTextI };
   googleMapsUri: string;
   location: {
     latitude: number;
@@ -29,23 +33,14 @@ export interface PlaceI {
   };
   formattedAddress: string;
   shortFormattedAddress: string;
-  types: Array<string>;
   rating?: number;
   userRatingCount?: number;
   priceLevel?: PriceLevelI;
   currentOpeningHours?: { openNow: boolean };
-  businessStatus?: "OPERATIONAL" | "CLOSED_TEMPORARILY" | "CLOSED_PERMANENTLY";
-}
-
-export interface EnrichedPlaceI extends PlaceI {
-  place_id?: string;
-  isFavorite?: boolean;
-  isWishlist?: boolean;
-  source?: "nearby" | "favorite";
-}
-
-export interface CoffeeShopsResponse {
-  results: Array<EnrichedPlaceI>;
-  status: string;
-  next_page_token?: string;
+  businessStatus?: BusinessStatusI;
+  source?: OptionsI;
+  // types: Array<string>;
+  // editorialSummary: LocalizedTextI;
+  // generativeSummary: { overview: LocalizedTextI };
+  // reviewSummary: { text: LocalizedTextI };
 }

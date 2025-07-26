@@ -1,8 +1,10 @@
+export type OptionsI = "nearby" | "favorites" | "wishlist";
+
 export interface FiltersI {
   rating: 4.0 | 4.4 | 4.8;
   radius: number;
   reviews: number;
-  showFavorites: boolean;
+  options: Set<OptionsI>;
 }
 
 export interface SelectType {

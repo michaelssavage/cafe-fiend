@@ -13,11 +13,24 @@ export function useFavorites() {
   });
 
   const {
-    mutate: saveMutate,
-    isPending: isSaving,
-    error: saveError,
+    mutate: saveFavoriteMutate,
+    isPending: isSavingFavorite,
+    error: saveFavoriteError,
   } = useMutation({
-    mutationFn: saveFavorite,
+    mutationFn: (shop: PlaceI) =>
+      saveFavorite({ data: { status: CafeStatus.FAVORITE, shop } }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["favorites"] });
+    },
+  });
+
+  const {
+    mutate: saveWishlistMutate,
+    isPending: isSavingWishlist,
+    error: saveWishlistError,
+  } = useMutation({
+    mutationFn: (shop: PlaceI) =>
+      saveFavorite({ data: { status: CafeStatus.WANT_TO_GO, shop } }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["favorites"] });
     },
@@ -37,11 +50,21 @@ export function useFavorites() {
     },
   });
 
-  const handleSaveFavorite = useCallback(
-    (shop: PlaceI) => {
-      saveMutate({ data: { status: CafeStatus.FAVORITE, shop } });
+  const {
+    mutate: hideCafeMutate,
+    isPending: isHiding,
+    error: hideError,
+  } = useMutation({
+    mutationFn: (shop: PlaceI) =>
+      saveFavorite({ data: { status: CafeStatus.HIDDEN, shop } }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["favorites"] });
     },
-    [saveMutate]
+  });
+
+  const handleSaveFavorite = useCallback(
+    (shop: PlaceI) => saveFavoriteMutate(shop),
+    [saveFavoriteMutate]
   );
 
   const handleRemoveFavorite = useCallback(
@@ -75,17 +98,13 @@ export function useFavorites() {
   );
 
   const handleHideCafe = useCallback(
-    (shop: PlaceI) => {
-      saveMutate({ data: { status: CafeStatus.HIDDEN, shop } });
-    },
-    [saveMutate]
+    (shop: PlaceI) => hideCafeMutate(shop),
+    [hideCafeMutate]
   );
 
   const handleAddToWishlist = useCallback(
-    (shop: PlaceI) => {
-      saveMutate({ data: { status: CafeStatus.WANT_TO_GO, shop } });
-    },
-    [saveMutate]
+    (shop: PlaceI) => saveWishlistMutate(shop),
+    [saveWishlistMutate]
   );
 
   return {
@@ -97,9 +116,13 @@ export function useFavorites() {
     handleRemoveFavorite,
     handleHideCafe,
     handleAddToWishlist,
-    isSaving,
+    isSavingFavorite,
+    isSavingWishlist,
+    isHiding,
     isRemoving,
-    saveError,
+    saveFavoriteError,
+    saveWishlistError,
+    hideError,
     removeError,
   };
 }

@@ -1,11 +1,11 @@
 import { useCallback } from "react";
 import { SingleValue } from "react-select";
 import { Flexbox } from "~/styles/Flexbox";
-import { FiltersI, SelectType, SetState } from "~/types/global.type";
+import { FiltersI, OptionsI, SelectType, SetState } from "~/types/global.type";
 import { RATING_OPTIONS, REVIEWS_OPTIONS } from "~/utils/constants";
-import { SelectForm } from "./SelectForm";
-import ToggleSwitch from "./ToggleSwitch";
-import { Trackbar } from "./Trackbar";
+import { PillToggle } from "./form/PillToggle";
+import { SelectForm } from "./form/SelectForm";
+import { Trackbar } from "./form/Trackbar";
 
 interface FiltersComponentI {
   filters: FiltersI;
@@ -31,14 +31,14 @@ export const Filters = ({ filters, setFilters }: FiltersComponentI) => {
   );
 
   const handleToggle = useCallback(
-    (key: string, v: boolean) => {
+    (key: string, v: Set<OptionsI>) => {
       setFilters((prev: FiltersI) => ({ ...prev, [key]: v }));
     },
     [setFilters]
   );
 
   return (
-    <Flexbox direction="row" margin="my-2" gap="gap-4">
+    <Flexbox direction="row" margin="my-2" gap="gap-4" align="items-end">
       <SelectForm<SelectType | undefined>
         id="review-select"
         label="Reviews"
@@ -62,12 +62,10 @@ export const Filters = ({ filters, setFilters }: FiltersComponentI) => {
         onValueChange={(val) => handleSlider("radius", val[0])}
       />
 
-      <ToggleSwitch
-        text="Show Favorites"
-        onChange={(val) => handleToggle("showFavorites", val)}
-        value={filters.showFavorites}
-        onColor="bg-green-500"
-        offColor="bg-gray-300"
+      <PillToggle
+        text="Display options"
+        activeOptions={filters.options}
+        setActiveOptions={(val) => handleToggle("options", val)}
       />
     </Flexbox>
   );

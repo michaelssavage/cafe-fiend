@@ -2,16 +2,21 @@ import clsx from "clsx";
 import React from "react";
 
 export interface FlexboxProps extends React.HTMLAttributes<HTMLDivElement> {
-  direction?: "row" | "column" | "row-reverse" | "column-reverse";
+  direction?: "row" | "col" | "row-reverse" | "col-reverse";
   justify?:
-    | "flex-start"
-    | "flex-end"
-    | "center"
-    | "space-between"
-    | "space-around"
-    | "space-evenly";
-  align?: "stretch" | "flex-start" | "flex-end" | "center" | "baseline";
-  wrap?: "nowrap" | "wrap" | "wrap-reverse";
+    | "justify-start"
+    | "justify-end"
+    | "justify-center"
+    | "justify-between"
+    | "justify-around"
+    | "justify-evenly";
+  align?:
+    | "items-stretch"
+    | "items-start"
+    | "items-end"
+    | "items-center"
+    | "items-baseline";
+  wrap?: "flex-nowrap" | "flex-wrap" | "flex-wrap-reverse";
   gap?: string;
   width?: string;
   flex?: string;
@@ -21,7 +26,7 @@ export interface FlexboxProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const Flexbox: React.FC<FlexboxProps> = ({
-  direction = "column",
+  direction = "col",
   justify,
   align,
   wrap,
@@ -34,38 +39,15 @@ export const Flexbox: React.FC<FlexboxProps> = ({
   className,
   ...rest
 }) => {
-  const justifyClassMap = {
-    "flex-start": "justify-start",
-    "flex-end": "justify-end",
-    center: "justify-center",
-    "space-between": "justify-between",
-    "space-around": "justify-around",
-    "space-evenly": "justify-evenly",
-  };
-
-  const alignClassMap = {
-    stretch: "items-stretch",
-    "flex-start": "items-start",
-    "flex-end": "items-end",
-    center: "items-center",
-    baseline: "items-baseline",
-  };
-
-  const wrapClassMap = {
-    nowrap: "flex-nowrap",
-    wrap: "flex-wrap",
-    "wrap-reverse": "flex-wrap-reverse",
-  };
-
   return (
     <div
       className={clsx(
         "flex",
         `flex-${direction}`,
         gap,
-        justify && justifyClassMap[justify],
-        align && alignClassMap[align],
-        wrap && wrapClassMap[wrap],
+        justify,
+        align,
+        wrap,
         visibility !== "visible" && `invisible`, // Tailwind doesn't have `collapse` for divs
         width,
         flex,

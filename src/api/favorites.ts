@@ -53,7 +53,7 @@ export const saveFavorite = createServerFn({ method: "POST" })
           rating: data.shop.rating,
           user_rating_count: data.shop.userRatingCount,
           price_level: data.shop.priceLevel,
-          vicinity: data.shop.formattedAddress,
+          formatted_address: data.shop.formattedAddress,
           business_status: data.shop.businessStatus,
           google_maps_uri: data.shop.googleMapsUri,
           short_formatted_address: data.shop.shortFormattedAddress,
