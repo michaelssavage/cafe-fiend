@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Map as GoogleMap } from "@vis.gl/react-google-maps";
+import { Map as GoogleMap, useMap } from "@vis.gl/react-google-maps";
 import { useEffect, useState } from "react";
 import AutoComplete from "~/components/AutoComplete";
 import { DraggableAdvancedMarker } from "~/components/DraggableMarker";
@@ -14,6 +14,8 @@ export const Route = createFileRoute("/_authed/")({
 });
 
 function Home() {
+  const map = useMap();
+
   const [filters, setFilters] = useState<FiltersI>({
     rating: 4.0,
     radius: 2000,
@@ -33,6 +35,10 @@ function Home() {
     getCurrentLocation();
   }, [getCurrentLocation]);
 
+  useEffect(() => {
+    if (map && location) map.panTo(location);
+  }, [map, location]);
+
   return (
     <div className="max-w-[900px] mx-auto">
       <h1 className="py-4">Cafe Fiend</h1>
@@ -44,7 +50,7 @@ function Home() {
         {location ? (
           <GoogleMap
             mapId="google-maps-id"
-            center={location}
+            defaultCenter={location}
             defaultZoom={13}
             gestureHandling="greedy"
             disableDefaultUI

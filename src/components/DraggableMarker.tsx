@@ -1,4 +1,4 @@
-import { useMap } from "@vis.gl/react-google-maps";
+import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
 import { House } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
 import { createRoot, Root } from "react-dom/client";
@@ -10,8 +10,8 @@ interface DraggableAdvancedMarkerProps {
 
 export const DraggableAdvancedMarker = ({ position, onDragEnd }: DraggableAdvancedMarkerProps) => {
   const map = useMap();
+  const markerLibrary = useMapsLibrary("marker");
 
-  const initializationAttempts = useRef(0);
   const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const rootRef = useRef<Root | null>(null);
@@ -45,10 +45,7 @@ export const DraggableAdvancedMarker = ({ position, onDragEnd }: DraggableAdvanc
   }, []);
 
   const createMarker = useCallback(() => {
-    if (!map || !position || markerRef.current) return false;
-
-    // Check if AdvancedMarkerElement is available
-    if (!window.google?.maps?.marker?.AdvancedMarkerElement) {
+    if (!map || !position || !markerLibrary || markerRef.current) {
       return false;
     }
 
@@ -65,7 +62,7 @@ export const DraggableAdvancedMarker = ({ position, onDragEnd }: DraggableAdvanc
         </div>,
       );
 
-      const marker = new google.maps.marker.AdvancedMarkerElement({
+      const marker = new markerLibrary.AdvancedMarkerElement({
         map,
         position: { lat: position.lat, lng: position.lng },
         gmpDraggable: true,
@@ -89,60 +86,24 @@ export const DraggableAdvancedMarker = ({ position, onDragEnd }: DraggableAdvanc
       cleanup();
       return false;
     }
-  }, [map, position, cleanup]);
+  }, [map, position, markerLibrary, cleanup]);
 
-  // Main effect for creating the marker
   useEffect(() => {
-    if (!map || !position) return;
+    if (!map || !position || !markerLibrary) return;
 
-    // Clean up existing marker
-    if (markerRef.current) {
-      cleanup();
-    }
+    if (markerRef.current) cleanup();
 
-    // Try to create marker immediately
-    if (createMarker()) {
-      initializationAttempts.current = 0;
-      return;
-    }
+    createMarker();
 
-    // If immediate creation fails, try with delays
-    const maxAttempts = 5;
-    let attemptCount = 0;
+    return () => cleanup();
+  }, [map, position, markerLibrary, createMarker, cleanup]);
 
-    const tryCreateMarker = () => {
-      attemptCount++;
-
-      if (createMarker()) {
-        initializationAttempts.current = 0;
-        return;
-      }
-
-      if (attemptCount < maxAttempts) {
-        setTimeout(tryCreateMarker, 100 * attemptCount); // Increasing delays
-      } else {
-        console.warn("Failed to create marker after", maxAttempts, "attempts");
-      }
-    };
-
-    // Start retry attempts
-    const timeout = setTimeout(tryCreateMarker, 100);
-
-    return () => {
-      clearTimeout(timeout);
-      cleanup();
-    };
-  }, [map, position, createMarker, cleanup]);
-
-  // Update marker position when position changes
   useEffect(() => {
-    if (markerRef.current && position) {
-      const currentPos = markerRef.current.position as google.maps.LatLngLiteral;
-      if (!currentPos || currentPos.lat !== position.lat || currentPos.lng !== position.lng) {
-        markerRef.current.position = { lat: position.lat, lng: position.lng };
-      }
-    }
-  }, [position]);
+    if (!map || !position || !markerRef.current) return;
+
+    markerRef.current.position = position;
+    map.panTo(position);
+  }, [position, map]);
 
   return null;
 };
