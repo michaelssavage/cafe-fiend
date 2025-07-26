@@ -38,7 +38,7 @@ export const Filters = ({ filters, setFilters }: FiltersComponentI) => {
   );
 
   return (
-    <Flexbox direction="row" margin="my-2" gap="gap-4" align="items-end">
+    <Flexbox direction="row" margin="my-2" gap="gap-4" align="items-end" wrap="flex-wrap">
       <SelectForm<SelectType | undefined>
         id="review-select"
         label="Reviews"

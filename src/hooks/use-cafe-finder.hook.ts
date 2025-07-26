@@ -42,6 +42,7 @@ export const useCafeFinder = ({
             rating: filters.rating,
             radius: filters.radius,
             reviews: filters.reviews,
+            openNow: filters.options.has("open now"),
           },
           favorites: favorites.map(({ place_id }) => place_id),
         },

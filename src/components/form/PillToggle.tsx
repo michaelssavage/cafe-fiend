@@ -9,7 +9,7 @@ interface PillToggleI {
   activeOptions: Set<OptionsI>;
 }
 
-const options: Array<OptionsI> = ["nearby", "favorites", "wishlist"];
+const options: Array<OptionsI> = ["nearby", "favorites", "wishlist", "open now"];
 
 export const PillToggle = ({
   text,
@@ -41,7 +41,7 @@ export const PillToggle = ({
               size="sm"
               onClick={() => toggleOption(option)}
               className={cn(
-                "px-4 py-1 text-xs transition-all duration-200 capitalize",
+                "px-4 py-1 text-xs transition-all duration-200 capitalize cursor-pointer",
                 index === 0 ? "rounded-l-full" : "",
                 index === options.length - 1 ? "rounded-r-full" : "",
                 index > 0 && index < options.length - 1 ? "rounded-none" : "",

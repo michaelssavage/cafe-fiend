@@ -33,10 +33,10 @@ function RootDocument({ children, user }: RootUserI) {
         <HeadContent />
       </head>
       <body>
-        {children}
-        <TanStackRouterDevtools position="top-right" />
-        <Scripts />
         <Navbar user={user} />
+        {children}
+        <TanStackRouterDevtools position="bottom-left" />
+        <Scripts />
       </body>
     </html>
   );

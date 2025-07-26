@@ -14,8 +14,8 @@ export const Navbar = ({ user }: { user: UserI }) => {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-[1000] px-8 py-4 bg-white border-t border-gray-200 shadow-[0_-1px_3px_rgba(0,0,0,0.1)]">
-      <Flexbox direction="row" align="items-center" justify="justify-between" width="100%">
+    <nav className="z-[1000] px-8 py-4 bg-white border-t border-gray-200 shadow-[0_-1px_3px_rgba(0,0,0,0.1)]">
+      <Flexbox direction="row" align="items-center" width="100%">
         <Flexbox direction="row" align="items-center">
           <Link to="/" className="text-blue-600 hover:underline">
             Home

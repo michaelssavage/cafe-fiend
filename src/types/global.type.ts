@@ -1,6 +1,6 @@
 import { PlaceI } from "./place.type";
 
-export type OptionsI = "nearby" | "favorites" | "wishlist";
+export type OptionsI = "nearby" | "favorites" | "wishlist" | "open now";
 
 export type RatingEnum = 4.0 | 4.4 | 4.8;
 
@@ -33,7 +33,9 @@ export type StringOrNull = string | null;
 export type SetState<T> = (val: T | ((prev: T) => T)) => void;
 
 // Server-specific types dont include options
-export type FiltersServerI = Omit<FiltersI, "options">;
+export interface FiltersServerI extends Omit<FiltersI, "options"> {
+  openNow?: boolean;
+}
 
 export interface CafeListsI {
   hiddenCafes: Array<string>;

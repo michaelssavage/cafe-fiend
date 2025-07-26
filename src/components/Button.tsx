@@ -35,12 +35,11 @@ export const Button = ({
     "rounded px-2 py-1 text-base font-medium font-inherit transition-all grid place-items-center cursor-pointer";
 
   const variants: Record<Variants, string> = {
-    primary:
-      "bg-white border border-indigo-500 text-indigo-500 hover:bg-indigo-500 hover:text-white",
+    primary: "bg-white border border-indigo-500 text-blue-600 hover:bg-indigo-500 hover:text-white",
     secondary:
-      "bg-indigo-500 border border-transparent text-white hover:bg-white hover:text-indigo-500 hover:border-indigo-500",
+      "bg-indigo-500 border border-transparent text-white hover:bg-white hover:text-blue-600 hover:border-indigo-500",
     clear: "bg-white border border-gray-800 rounded-full text-gray-800 p-1 hover:bg-gray-100",
-    link: "bg-transparent border-none text-indigo-500 hover:underline px-2 py-1",
+    link: "bg-transparent border-none text-blue-600 hover:underline px-2 py-1",
     custom: custom,
   };
 

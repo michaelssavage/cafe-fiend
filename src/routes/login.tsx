@@ -57,7 +57,7 @@ function Login() {
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm">
         <div className="flex flex-col gap-6">
-          <Card>
+          <Card className="bg-white">
             <CardHeader>
               <CardTitle className="text-2xl">Login</CardTitle>
               <CardDescription>Enter your email below to login to your account</CardDescription>
@@ -89,6 +89,7 @@ function Login() {
                     <Input
                       id="password"
                       type="password"
+                      placeholder="****"
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}

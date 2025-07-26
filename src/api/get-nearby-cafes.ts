@@ -15,7 +15,7 @@ const fetchCafe = async (
   latitude: number,
   longitude: number,
   radius: number,
-  rating: number,
+  filters: FiltersServerI,
 ): Promise<Array<PlaceI>> => {
   const url = "https://places.googleapis.com/v1/places:searchText";
 
@@ -24,7 +24,8 @@ const fetchCafe = async (
     textQuery: "cafe OR specialty coffee OR espresso bar OR coffeehouse",
     includedType: "cafe",
     pageSize: 20,
-    minRating: rating,
+    minRating: filters.rating,
+    openNow: filters.openNow,
     rankPreference: "DISTANCE",
     locationBias: {
       circle: {
@@ -111,6 +112,7 @@ export const findNearbyCafes = createServerFn({ method: "POST" })
       rating: (data.filters?.rating
         ? parseFloat(data.filters.rating.toString())
         : 4.0) as RatingEnum,
+      openNow: data.filters?.openNow ?? false,
     };
 
     if (filters.rating < 0 || filters.rating > 5) {
@@ -145,12 +147,7 @@ export const findNearbyCafes = createServerFn({ method: "POST" })
 
         console.log(`Attempt ${attempt + 1}: Searching with radius ${currentRadius}m`);
 
-        const places = await fetchCafe(
-          data.latitude,
-          data.longitude,
-          currentRadius,
-          data.filters.rating,
-        );
+        const places = await fetchCafe(data.latitude, data.longitude, currentRadius, data.filters);
 
         // Add new unique places
         const newPlaces = places.filter((place) => place.id && !seenPlaceIds.has(place.id));

@@ -40,7 +40,7 @@ function Home() {
   }, [map, location]);
 
   return (
-    <div className="max-w-[900px] mx-auto">
+    <div className="max-w-[900px] mx-auto px-2 pb-3">
       <h1 className="py-4">Cafe Fiend</h1>
       <p className="pb-2 text-lg">Find your next favourite coffee</p>
 
