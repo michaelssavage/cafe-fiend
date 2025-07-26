@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { FindNearbyCafesI } from "~/types/global.type";
+import { FiltersServerI, FindNearbyCafesServerI } from "~/types/global.type";
 import { fieldMask } from "~/utils/constants";
 import type { PlaceI } from "../types/place.type";
 
@@ -7,17 +7,10 @@ interface PlacesResponse {
   places: Array<PlaceI>;
 }
 
-// Type definition for filters
-interface PlaceFilters {
-  radius: number;
-  rating: number;
-  reviews: number;
-}
-
 const filterResults = (
   results: Array<PlaceI>,
-  filters: PlaceFilters,
-  hiddenFavorites: Array<string>
+  filters: FiltersServerI,
+  favorites: Array<string>
 ) => {
   const filteredResults = results.filter((place) => {
     // Ensure place has a valid place_id
@@ -26,8 +19,8 @@ const filterResults = (
       return false;
     }
 
-    // Filter out places that are in the hidden favorites
-    if (hiddenFavorites.includes(place.id)) {
+    // Filter out places that are in the favorites
+    if (favorites.includes(place.id)) {
       return false;
     }
 
@@ -43,8 +36,8 @@ const filterResults = (
   return filteredResults;
 };
 
-export const findNearbyCoffeeShops = createServerFn({ method: "POST" })
-  .validator((data: FindNearbyCafesI) => {
+export const findNearbyCafes = createServerFn({ method: "POST" })
+  .validator((data: FindNearbyCafesServerI) => {
     // Validate required fields
     if (!data.lat || !data.long) {
       throw new Error("Latitude and longitude are required");
@@ -66,19 +59,17 @@ export const findNearbyCoffeeShops = createServerFn({ method: "POST" })
       throw new Error("Longitude must be between -180 and 180");
     }
 
-    // Validate radius (optional, with default)
-
-    // Validate filters (optional, with defaults)
     const filters = {
       radius: data.filters?.radius
         ? parseInt(data.filters?.radius.toString(), 10)
         : 1000,
-      rating: data.filters?.rating
+      rating: (data.filters?.rating
         ? parseFloat(data.filters.rating.toString())
-        : 4.0,
+        : 4.0) as 4.0 | 4.4 | 4.8,
       reviews: data.filters?.reviews
         ? parseInt(data.filters.reviews.toString(), 10)
         : 10,
+      options: data.filters?.options || [],
     };
 
     if (filters.rating < 0 || filters.rating > 5) {
@@ -101,7 +92,7 @@ export const findNearbyCoffeeShops = createServerFn({ method: "POST" })
       latitude,
       longitude,
       filters,
-      hiddenFavorites: data.hiddenFavorites || [],
+      favorites: data.favorites || [],
     };
   })
   .handler(async ({ data }) => {
@@ -151,7 +142,7 @@ export const findNearbyCoffeeShops = createServerFn({ method: "POST" })
       const { places } = (await response.json()) as PlacesResponse;
       console.log("Google Places API response:", places.length, "places found");
 
-      const results = filterResults(places, data.filters, data.hiddenFavorites);
+      const results = filterResults(places, data.filters, data.favorites);
 
       return {
         results,

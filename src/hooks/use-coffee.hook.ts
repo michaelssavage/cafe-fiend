@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { findNearbyCoffeeShops } from "~/api/get-nearby-cafes";
+import { findNearbyCafes } from "~/api/get-nearby-cafes";
 import { FindNearbyCafesI } from "~/types/global.type";
 import { PlaceI } from "~/types/place.type";
 import { CafeStatus } from "~/utils/constants";
@@ -14,39 +14,37 @@ export const useCoffeeShops = ({
 }: Omit<FindNearbyCafesI, "hiddenFavorites">) => {
   const { favorites } = useFavorites();
 
-  const { hiddenFavorites, favoriteCafes, wishlistCafes } = useMemo(() => {
-    const hidden = favorites
-      .filter((favorite) => favorite.status === (CafeStatus.HIDDEN as string))
-      .map((favorite) => favorite.place_id);
-
-    const favoriteShops = favorites
+  const { favoriteCafes, wishlistCafes } = useMemo(() => {
+    const favoriteCafes = favorites
       .filter((favorite) => favorite.status === (CafeStatus.FAVORITE as string))
       .map(transformFavoriteToPlace);
 
-    const wishlistShops = favorites
+    const wishlistCafes = favorites
       .filter(
         (favorite) => favorite.status === (CafeStatus.WANT_TO_GO as string)
       )
       .map(transformFavoriteToPlace);
 
     return {
-      hiddenFavorites: hidden,
-      favoriteCafes: favoriteShops,
-      wishlistCafes: wishlistShops,
+      favoriteCafes,
+      wishlistCafes,
     };
   }, [favorites]);
 
   const shouldFetchNearby = filters.options.has("nearby");
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["coffeeShops", lat, long, filters, hiddenFavorites],
+    queryKey: ["coffeeShops", lat, long, filters, favorites],
     queryFn: () =>
-      findNearbyCoffeeShops({
+      findNearbyCafes({
         data: {
           lat,
           long,
-          filters: filters || { rating: 4.0, reviews: 10, radius: 2000 },
-          hiddenFavorites,
+          filters: {
+            ...filters,
+            options: Array.from(filters.options),
+          },
+          favorites: favoriteCafes.map(({ id }) => id),
         },
       }),
     enabled: !!(lat && long) && shouldFetchNearby,

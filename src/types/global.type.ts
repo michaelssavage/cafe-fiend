@@ -1,3 +1,5 @@
+import { PlaceI } from "./place.type";
+
 export type OptionsI = "nearby" | "favorites" | "wishlist";
 
 export interface FiltersI {
@@ -27,3 +29,24 @@ export interface FindNearbyCafesI {
 export type StringOrNull = string | null;
 
 export type SetState<T> = (val: T | ((prev: T) => T)) => void;
+
+// Server-specific types that use arrays instead of Sets
+export interface FiltersServerI {
+  rating: 4.0 | 4.4 | 4.8;
+  radius: number;
+  reviews: number;
+  options: Array<OptionsI>;
+}
+
+export interface CafeListsI {
+  hiddenCafes: Array<string>;
+  favoriteCafes: Array<PlaceI>;
+  wishlistCafes: Array<PlaceI>;
+}
+
+export interface FindNearbyCafesServerI {
+  lat?: number;
+  long?: number;
+  filters: FiltersServerI;
+  favorites: Array<string>;
+}
