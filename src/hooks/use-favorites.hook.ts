@@ -17,8 +17,7 @@ export function useFavorites() {
     isPending: isSavingFavorite,
     error: saveFavoriteError,
   } = useMutation({
-    mutationFn: (shop: PlaceI) =>
-      saveFavorite({ data: { status: CafeStatus.FAVORITE, shop } }),
+    mutationFn: (shop: PlaceI) => saveFavorite({ data: { status: CafeStatus.FAVORITE, shop } }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["favorites"] });
     },
@@ -29,8 +28,7 @@ export function useFavorites() {
     isPending: isSavingWishlist,
     error: saveWishlistError,
   } = useMutation({
-    mutationFn: (shop: PlaceI) =>
-      saveFavorite({ data: { status: CafeStatus.WANT_TO_GO, shop } }),
+    mutationFn: (shop: PlaceI) => saveFavorite({ data: { status: CafeStatus.WANT_TO_GO, shop } }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["favorites"] });
     },
@@ -55,8 +53,7 @@ export function useFavorites() {
     isPending: isHiding,
     error: hideError,
   } = useMutation({
-    mutationFn: (shop: PlaceI) =>
-      saveFavorite({ data: { status: CafeStatus.HIDDEN, shop } }),
+    mutationFn: (shop: PlaceI) => saveFavorite({ data: { status: CafeStatus.HIDDEN, shop } }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["favorites"] });
     },
@@ -64,7 +61,7 @@ export function useFavorites() {
 
   const handleSaveFavorite = useCallback(
     (shop: PlaceI) => saveFavoriteMutate(shop),
-    [saveFavoriteMutate]
+    [saveFavoriteMutate],
   );
 
   const handleRemoveFavorite = useCallback(
@@ -72,39 +69,32 @@ export function useFavorites() {
       console.log("Hook - Removing favorite for placeId:", placeId);
       removeMutate({ data: { placeId } });
     },
-    [removeMutate]
+    [removeMutate],
   );
 
   const isFavorite = useCallback(
     (placeId: string) => {
       return favorites.some(
-        (fav) =>
-          fav.place_id === placeId &&
-          fav.status === (CafeStatus.FAVORITE as string)
+        (fav) => fav.place_id === placeId && fav.status === (CafeStatus.FAVORITE as string),
       );
     },
-    [favorites]
+    [favorites],
   );
 
   const isWishlist = useCallback(
     (placeId: string) => {
       return favorites.some(
-        (fav) =>
-          fav.place_id === placeId &&
-          fav.status === (CafeStatus.WANT_TO_GO as string)
+        (fav) => fav.place_id === placeId && fav.status === (CafeStatus.WANT_TO_GO as string),
       );
     },
-    [favorites]
+    [favorites],
   );
 
-  const handleHideCafe = useCallback(
-    (shop: PlaceI) => hideCafeMutate(shop),
-    [hideCafeMutate]
-  );
+  const handleHideCafe = useCallback((shop: PlaceI) => hideCafeMutate(shop), [hideCafeMutate]);
 
   const handleAddToWishlist = useCallback(
     (shop: PlaceI) => saveWishlistMutate(shop),
-    [saveWishlistMutate]
+    [saveWishlistMutate],
   );
 
   return {

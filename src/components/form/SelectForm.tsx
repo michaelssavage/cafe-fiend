@@ -15,10 +15,7 @@ interface SelectI<T> {
   label?: string;
   value: T;
   options: Options<T>;
-  onChange: (
-    newValue: SingleValue<T> | MultiValue<T>,
-    actionMeta: ActionMeta<T>
-  ) => void;
+  onChange: (newValue: SingleValue<T> | MultiValue<T>, actionMeta: ActionMeta<T>) => void;
   styles?: StylesConfig<T, boolean, GroupBase<T>>;
 }
 
@@ -51,14 +48,7 @@ const baseStyles = {
   }),
 };
 
-export const SelectForm = <T,>({
-  id,
-  label,
-  value,
-  options,
-  onChange,
-  styles,
-}: SelectI<T>) => {
+export const SelectForm = <T,>({ id, label, value, options, onChange, styles }: SelectI<T>) => {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {

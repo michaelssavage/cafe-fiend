@@ -20,21 +20,21 @@ export const Filters = ({ filters, setFilters }: FiltersComponentI) => {
         [key]: v?.value,
       }));
     },
-    [setFilters]
+    [setFilters],
   );
 
   const handleSlider = useCallback(
     (key: string, v: number) => {
       setFilters((prev: FiltersI) => ({ ...prev, [key]: v }));
     },
-    [setFilters]
+    [setFilters],
   );
 
   const handleToggle = useCallback(
     (key: string, v: Set<OptionsI>) => {
       setFilters((prev: FiltersI) => ({ ...prev, [key]: v }));
     },
-    [setFilters]
+    [setFilters],
   );
 
   return (

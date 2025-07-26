@@ -1,10 +1,6 @@
-import {
-  ControlPosition,
-  MapControl,
-  useMapsLibrary,
-} from "@vis.gl/react-google-maps";
+import { ControlPosition, MapControl, useMapsLibrary } from "@vis.gl/react-google-maps";
 import { Locate, LocateFixed } from "lucide-react";
-import React, { FormEvent, useCallback, useState } from "react";
+import { FormEvent, memo, useCallback, useState } from "react";
 import { useAutocompleteSuggestions } from "~/hooks/use-auto-complete.hook";
 import { useGeolocation } from "~/hooks/use-location.hook";
 import { Flexbox } from "~/styles/Flexbox";
@@ -25,11 +21,7 @@ const AutoComplete = ({ onPlaceSelect, isLoading }: Props) => {
     setInputValue((event.target as HTMLInputElement).value);
   }, []);
 
-  const {
-    error: locationError,
-    loading,
-    getCurrentLocation,
-  } = useGeolocation();
+  const { error: locationError, loading, getCurrentLocation } = useGeolocation();
 
   const handleSuggestionClick = useCallback(
     async (suggestion: google.maps.places.AutocompleteSuggestion) => {
@@ -39,12 +31,7 @@ const AutoComplete = ({ onPlaceSelect, isLoading }: Props) => {
       const place = suggestion.placePrediction.toPlace();
 
       await place.fetchFields({
-        fields: [
-          "viewport",
-          "location",
-          "svgIconMaskURI",
-          "iconBackgroundColor",
-        ],
+        fields: ["viewport", "location", "svgIconMaskURI", "iconBackgroundColor"],
       });
 
       setInputValue("");
@@ -59,7 +46,7 @@ const AutoComplete = ({ onPlaceSelect, isLoading }: Props) => {
         onPlaceSelect(location);
       }
     },
-    [places, onPlaceSelect, resetSession]
+    [places, onPlaceSelect, resetSession],
   );
 
   return (
@@ -103,4 +90,4 @@ const AutoComplete = ({ onPlaceSelect, isLoading }: Props) => {
   );
 };
 
-export default React.memo(AutoComplete);
+export default memo(AutoComplete);

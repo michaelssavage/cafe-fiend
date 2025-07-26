@@ -1,11 +1,6 @@
 /// <reference types="vite/client" />
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  HeadContent,
-  Outlet,
-  Scripts,
-  createRootRoute,
-} from "@tanstack/react-router";
+import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { createServerFn } from "@tanstack/react-start";
 import { APIProvider } from "@vis.gl/react-google-maps";
@@ -76,9 +71,7 @@ export const Route = createRootRoute({
 
     return (
       <QueryClientProvider client={queryClient}>
-        <APIProvider
-          apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string}
-        >
+        <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string}>
           <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
             <RootDocument user={user}>
               <Outlet />

@@ -1,13 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Button } from "~/components/Button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { getSupabaseClient } from "~/lib/supabase/client";
@@ -50,14 +44,12 @@ function ForgotPassword() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-2xl">Check Your Email</CardTitle>
-                <CardDescription>
-                  Password reset instructions sent
-                </CardDescription>
+                <CardDescription>Password reset instructions sent</CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  If you registered using your email and password, you will
-                  receive a password reset email.
+                  If you registered using your email and password, you will receive a password reset
+                  email.
                 </p>
               </CardContent>
             </Card>
@@ -66,8 +58,7 @@ function ForgotPassword() {
               <CardHeader>
                 <CardTitle className="text-2xl">Reset Your Password</CardTitle>
                 <CardDescription>
-                  Type in your email and we&apos;ll send you a link to reset
-                  your password
+                  Type in your email and we&apos;ll send you a link to reset your password
                 </CardDescription>
               </CardHeader>
               <CardContent>

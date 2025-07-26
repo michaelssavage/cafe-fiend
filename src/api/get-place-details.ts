@@ -44,8 +44,7 @@ export const getPlaceDetails = createServerFn({ method: "POST" })
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
-                "X-Goog-Api-Key": import.meta.env
-                  .VITE_GOOGLE_MAPS_API_KEY as string,
+                "X-Goog-Api-Key": import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string,
                 "X-Goog-FieldMask": fieldMask.join(","),
               },
             });
@@ -54,7 +53,7 @@ export const getPlaceDetails = createServerFn({ method: "POST" })
               console.error(
                 `Failed to fetch place ${placeId}:`,
                 response.status,
-                response.statusText
+                response.statusText,
               );
               return null;
             }
@@ -65,16 +64,14 @@ export const getPlaceDetails = createServerFn({ method: "POST" })
             console.error(`Error fetching place ${placeId}:`, error);
             return null;
           }
-        })
+        }),
       );
 
       // Filter out failed requests
-      const validDetails = placeDetails.filter(
-        (place): place is PlaceI => place !== null
-      );
+      const validDetails = placeDetails.filter((place): place is PlaceI => place !== null);
 
       console.log(
-        `Successfully fetched ${validDetails.length}/${data.placeIds.length} place details`
+        `Successfully fetched ${validDetails.length}/${data.placeIds.length} place details`,
       );
 
       return validDetails;

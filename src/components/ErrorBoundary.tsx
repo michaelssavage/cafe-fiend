@@ -1,11 +1,5 @@
 import type { ErrorComponentProps } from "@tanstack/react-router";
-import {
-  ErrorComponent,
-  Link,
-  rootRouteId,
-  useMatch,
-  useRouter,
-} from "@tanstack/react-router";
+import { ErrorComponent, Link, rootRouteId, useMatch, useRouter } from "@tanstack/react-router";
 import { Flexbox } from "~/styles/Flexbox";
 import { Button } from "./Button";
 

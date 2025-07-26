@@ -1,13 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Button } from "~/components/Button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { getSupabaseClient } from "~/lib/supabase/client";
@@ -47,9 +41,7 @@ function UpdatePassword() {
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl">Reset Your Password</CardTitle>
-              <CardDescription>
-                Please enter your new password below.
-              </CardDescription>
+              <CardDescription>Please enter your new password below.</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={(e) => void handleForgotPassword(e)}>

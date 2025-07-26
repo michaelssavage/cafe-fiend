@@ -10,7 +10,7 @@ interface PlacesResponse {
 const filterResults = (
   results: Array<PlaceI>,
   filters: FiltersServerI,
-  favorites: Array<string>
+  favorites: Array<string>,
 ) => {
   const filteredResults = results.filter((place) => {
     // Ensure place has a valid place_id
@@ -27,8 +27,7 @@ const filterResults = (
     const businessIsOpen = place.businessStatus === "OPERATIONAL";
 
     const hasGoodRating = place.rating && place.rating > filters.rating;
-    const hasEnoughReviews =
-      place.userRatingCount && place.userRatingCount > filters.reviews;
+    const hasEnoughReviews = place.userRatingCount && place.userRatingCount > filters.reviews;
 
     return businessIsOpen && hasGoodRating && hasEnoughReviews;
   });
@@ -60,15 +59,12 @@ export const findNearbyCafes = createServerFn({ method: "POST" })
     }
 
     const filters = {
-      radius: data.filters?.radius
-        ? parseInt(data.filters?.radius.toString(), 10)
-        : 1000,
-      rating: (data.filters?.rating
-        ? parseFloat(data.filters.rating.toString())
-        : 4.0) as 4.0 | 4.4 | 4.8,
-      reviews: data.filters?.reviews
-        ? parseInt(data.filters.reviews.toString(), 10)
-        : 10,
+      radius: data.filters?.radius ? parseInt(data.filters?.radius.toString(), 10) : 1000,
+      rating: (data.filters?.rating ? parseFloat(data.filters.rating.toString()) : 4.0) as
+        | 4.0
+        | 4.4
+        | 4.8,
+      reviews: data.filters?.reviews ? parseInt(data.filters.reviews.toString(), 10) : 10,
     };
 
     if (filters.rating < 0 || filters.rating > 5) {
@@ -79,11 +75,7 @@ export const findNearbyCafes = createServerFn({ method: "POST" })
       throw new Error("Reviews filter must be non-negative");
     }
 
-    if (
-      isNaN(filters.radius) ||
-      filters.radius <= 0 ||
-      filters.radius > 50000
-    ) {
+    if (isNaN(filters.radius) || filters.radius <= 0 || filters.radius > 50000) {
       throw new Error("Radius must be a positive number up to 50000 meters");
     }
 
@@ -127,15 +119,8 @@ export const findNearbyCafes = createServerFn({ method: "POST" })
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(
-          "Google Places API error:",
-          response.status,
-          response.statusText,
-          errorText
-        );
-        throw new Error(
-          `Google Places API error: ${response.status} - ${errorText}`
-        );
+        console.error("Google Places API error:", response.status, response.statusText, errorText);
+        throw new Error(`Google Places API error: ${response.status} - ${errorText}`);
       }
 
       const { places } = (await response.json()) as PlacesResponse;

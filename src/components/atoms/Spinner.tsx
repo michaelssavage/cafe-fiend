@@ -17,10 +17,7 @@ export const Spinner = ({ size = 24, className }: SpinnerProps) => {
     <div
       id="loading-spinner"
       role="status"
-      className={cn(
-        "rounded-full border-black/10 border-t-current animate-spin",
-        className
-      )}
+      className={cn("rounded-full border-black/10 border-t-current animate-spin", className)}
       style={sizeStyles}
     />
   );

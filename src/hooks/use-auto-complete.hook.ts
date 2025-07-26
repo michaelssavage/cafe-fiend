@@ -9,18 +9,17 @@ export interface UseAutocompleteSuggestionsReturn {
 
 export function useAutocompleteSuggestions(
   inputString: string,
-  requestOptions: Partial<google.maps.places.AutocompleteRequest> = {}
+  requestOptions: Partial<google.maps.places.AutocompleteRequest> = {},
 ): UseAutocompleteSuggestionsReturn {
   const placesLib = useMapsLibrary("places");
 
   // stores the current sessionToken
-  const sessionTokenRef =
-    useRef<google.maps.places.AutocompleteSessionToken>(null);
+  const sessionTokenRef = useRef<google.maps.places.AutocompleteSessionToken>(null);
 
   // the suggestions based on the specified input
-  const [suggestions, setSuggestions] = useState<
-    Array<google.maps.places.AutocompleteSuggestion>
-  >([]);
+  const [suggestions, setSuggestions] = useState<Array<google.maps.places.AutocompleteSuggestion>>(
+    [],
+  );
 
   // indicates if there is currently an incomplete request to the places API
   const [isLoading, setIsLoading] = useState(false);
@@ -51,8 +50,7 @@ export function useAutocompleteSuggestions(
 
       setIsLoading(true);
       try {
-        const res =
-          await AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+        const res = await AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
         setSuggestions(res.suggestions);
       } catch (error) {
         console.error("Error fetching suggestions:", error);

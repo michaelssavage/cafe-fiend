@@ -68,7 +68,7 @@ export const useGeolocation = () => {
         setError(errorMessage);
         setLoading(false);
       },
-      options
+      options,
     );
   }, []);
 

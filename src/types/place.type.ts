@@ -16,10 +16,7 @@ type PriceLevelI =
   | "PRICE_LEVEL_EXPENSIVE"
   | "PRICE_LEVEL_VERY_EXPENSIVE";
 
-export type BusinessStatusI =
-  | "OPERATIONAL"
-  | "CLOSED_TEMPORARILY"
-  | "CLOSED_PERMANENTLY";
+export type BusinessStatusI = "OPERATIONAL" | "CLOSED_TEMPORARILY" | "CLOSED_PERMANENTLY";
 
 // https://developers.google.com/maps/documentation/places/web-service/reference/rest/v1/places#Place
 

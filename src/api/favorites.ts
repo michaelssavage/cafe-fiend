@@ -61,7 +61,7 @@ export const saveFavorite = createServerFn({ method: "POST" })
         {
           onConflict: "place_id,user_id", // define uniqueness
           ignoreDuplicates: false, // We want to update, not ignore
-        }
+        },
       )
       .select()
       .single();
@@ -124,38 +124,36 @@ export const removeFavorite = createServerFn({ method: "POST" })
     return { success: true };
   });
 
-export const getFavorites = createServerFn({ method: "GET" }).handler(
-  async () => {
-    const supabase = getSupabaseServerClient();
+export const getFavorites = createServerFn({ method: "GET" }).handler(async () => {
+  const supabase = getSupabaseServerClient();
 
-    const authResponse = await supabase.auth.getUser();
-    const {
-      data: { user },
-      error: authError,
-    } = authResponse;
+  const authResponse = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error: authError,
+  } = authResponse;
 
-    if (authError) {
-      console.error("Authentication error in getFavorites:", authError.message);
-      throw new Error("Unauthorized: " + authError.message);
-    }
-
-    if (!user) {
-      console.log("No user found in getFavorites. Unauthorized.");
-      throw new Error("Unauthorized: User not found");
-    }
-
-    const { data, error } = await supabase
-      .from("saved")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Supabase fetch favorites error:", error.message);
-      throw new Error(`Failed to fetch favorites: ${error.message}`);
-    }
-
-    console.log("Favorites fetched successfully:", data?.length);
-    return (data as Array<Favorite>) || [];
+  if (authError) {
+    console.error("Authentication error in getFavorites:", authError.message);
+    throw new Error("Unauthorized: " + authError.message);
   }
-);
+
+  if (!user) {
+    console.log("No user found in getFavorites. Unauthorized.");
+    throw new Error("Unauthorized: User not found");
+  }
+
+  const { data, error } = await supabase
+    .from("saved")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Supabase fetch favorites error:", error.message);
+    throw new Error(`Failed to fetch favorites: ${error.message}`);
+  }
+
+  console.log("Favorites fetched successfully:", data?.length);
+  return (data as Array<Favorite>) || [];
+});

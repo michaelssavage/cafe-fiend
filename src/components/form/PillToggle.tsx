@@ -30,14 +30,7 @@ export const PillToggle = ({
   return (
     <div className="ml-auto flex flex-col gap-1">
       {text && (
-        <p
-          className={cn(
-            "text-xs",
-            disabled ? "text-gray-400" : "text-gray-900"
-          )}
-        >
-          {text}
-        </p>
+        <p className={cn("text-xs", disabled ? "text-gray-400" : "text-gray-900")}>{text}</p>
       )}
       <div className="flex items-center justify-center bg-gray-50">
         <div className="flex rounded-full border border-gray-200 bg-white">
@@ -54,7 +47,7 @@ export const PillToggle = ({
                 index > 0 && index < options.length - 1 ? "rounded-none" : "",
                 activeOptions.has(option)
                   ? "bg-green-500 border-1 border-green-600 text-white hover:bg-green-600"
-                  : "text-gray-700 hover:bg-gray-100"
+                  : "text-gray-700 hover:bg-gray-100",
               )}
             >
               {option}

@@ -10,12 +10,7 @@ export interface FlexboxProps extends React.HTMLAttributes<HTMLDivElement> {
     | "justify-between"
     | "justify-around"
     | "justify-evenly";
-  align?:
-    | "items-stretch"
-    | "items-start"
-    | "items-end"
-    | "items-center"
-    | "items-baseline";
+  align?: "items-stretch" | "items-start" | "items-end" | "items-center" | "items-baseline";
   wrap?: "flex-nowrap" | "flex-wrap" | "flex-wrap-reverse";
   gap?: string;
   width?: string;
@@ -52,7 +47,7 @@ export const Flexbox: React.FC<FlexboxProps> = ({
         width,
         flex,
         margin,
-        className
+        className,
       )}
       {...rest}
     >

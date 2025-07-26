@@ -20,9 +20,7 @@ export const useCoffeeShops = ({
       .map(transformFavoriteToPlace);
 
     const wishlistCafes = favorites
-      .filter(
-        (favorite) => favorite.status === (CafeStatus.WANT_TO_GO as string)
-      )
+      .filter((favorite) => favorite.status === (CafeStatus.WANT_TO_GO as string))
       .map(transformFavoriteToPlace);
 
     return {
