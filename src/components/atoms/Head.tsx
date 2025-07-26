@@ -10,11 +10,11 @@ export const Head = () => ({
       name: "viewport",
       content: "width=device-width, initial-scale=1",
     },
+    ...seo({
+      title: "Cafe fiend",
+      description: `Cafe fiend is your fix for the next coffee.`,
+    }),
   ],
-  ...seo({
-    title: "Cafe fiend",
-    description: `Cafe fiend is your fix for the next coffee.`,
-  }),
   links: [
     { rel: "stylesheet", href: appCss },
     {
