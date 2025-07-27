@@ -9,6 +9,8 @@ yarn.lock
 .output
 .nitro
 /build/
+dist
+.netlify
 /api/
 /server/build
 /public/build# Sentry Config File

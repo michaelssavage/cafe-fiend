@@ -19,7 +19,7 @@ export const ErrorBoundary = ({ error }: ErrorComponentProps) => {
   return (
     <div className="max-w-[900px] mx-auto mt-8">
       <ErrorComponent error={error} />
-      <Flexbox direction="row" align="center">
+      <Flexbox direction="row" align="items-center">
         <Button onClick={tryAgain} text="Try Again" />
         {isRoot ? (
           <Link to="/">Home</Link>
