@@ -9,8 +9,8 @@ import { NotFound } from "~/components/atoms/NotFound";
 import { ErrorBoundary } from "~/components/ErrorBoundary";
 import { Navbar } from "~/components/Navbar";
 import { ThemeProvider } from "~/context/theme-provider.context";
-import { getSupabaseClient } from "~/lib/supabase/client";
-import { getSupabaseServerClient } from "~/lib/supabase/server";
+import { getSupabaseClient } from "~/lib/supabase-client";
+import { getSupabaseServerClient } from "~/lib/supabase-server";
 import { RootUserI } from "~/types/user.type";
 
 const queryClient = new QueryClient();

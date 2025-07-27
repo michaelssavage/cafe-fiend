@@ -1,5 +1,5 @@
 /** Spinner.tsx */
-import { cn } from "~/lib/utils";
+import { cn } from "~/utils/class-names";
 
 interface SpinnerProps {
   size?: number;

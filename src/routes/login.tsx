@@ -6,7 +6,7 @@ import { Button } from "~/components/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { getSupabaseServerClient } from "~/lib/supabase/server";
+import { getSupabaseServerClient } from "~/lib/supabase-server";
 import { LoginUserI } from "~/types/user.type";
 
 const loginFn = createServerFn({ method: "POST" })

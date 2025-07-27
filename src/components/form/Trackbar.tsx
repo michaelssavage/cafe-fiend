@@ -1,5 +1,5 @@
 import { Range, Root, Thumb, Track } from "@radix-ui/react-slider";
-import { cn } from "~/lib/utils";
+import { cn } from "~/utils/class-names";
 
 interface SliderProps {
   id: string;

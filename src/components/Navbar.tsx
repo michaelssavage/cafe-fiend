@@ -1,5 +1,5 @@
 import { Link, useRouter } from "@tanstack/react-router";
-import { getSupabaseClient } from "~/lib/supabase/client";
+import { getSupabaseClient } from "~/lib/supabase-client";
 import { Flexbox } from "~/styles/Flexbox";
 import { UserI } from "~/types/user.type";
 import { Button } from "./Button";

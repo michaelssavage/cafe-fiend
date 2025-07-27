@@ -4,7 +4,7 @@ import { Button } from "~/components/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { getSupabaseClient } from "~/lib/supabase/client";
+import { getSupabaseClient } from "~/lib/supabase-client";
 
 export const Route = createFileRoute("/forgot-password")({
   component: ForgotPassword,

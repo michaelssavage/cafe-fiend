@@ -1,6 +1,6 @@
 import { Button } from "~/components/ui/button";
-import { cn } from "~/lib/utils";
 import { OptionsI } from "~/types/global.type";
+import { cn } from "~/utils/class-names";
 
 interface PillToggleI {
   text: string;
