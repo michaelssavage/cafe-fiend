@@ -74,7 +74,7 @@ const filterResults = (
 
     const businessIsOpen = place.businessStatus === "OPERATIONAL";
 
-    const hasGoodRating = place.rating && place.rating > filters.rating;
+    const hasGoodRating = place.rating && place.rating >= filters.rating;
     const hasEnoughReviews = place.userRatingCount && place.userRatingCount > filters.reviews;
 
     return businessIsOpen && hasGoodRating && hasEnoughReviews;

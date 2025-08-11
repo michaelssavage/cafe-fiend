@@ -7,8 +7,13 @@ const options = {
   maximumAge: 300000, // 5 minutes
 };
 
+const barcelonaCoords: LocationI = {
+  lat: 41.38879,
+  lng: 2.15899,
+};
+
 export const useGeolocation = () => {
-  const [location, setLocation] = useState<LocationI | null>(null);
+  const [location, setLocation] = useState<LocationI | null>(barcelonaCoords);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 

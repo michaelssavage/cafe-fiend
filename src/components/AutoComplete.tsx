@@ -4,15 +4,13 @@ import { FormEvent, memo, useCallback, useState } from "react";
 import { useAutocompleteSuggestions } from "~/hooks/use-auto-complete.hook";
 import { useGeolocation } from "~/hooks/use-location.hook";
 import { Flexbox } from "~/styles/Flexbox";
-import { LocationI } from "~/types/global.type";
 import { Button } from "./Button";
 
 interface Props {
-  onPlaceSelect: (place: LocationI) => void;
   isLoading: boolean;
 }
 
-const AutoComplete = ({ onPlaceSelect, isLoading }: Props) => {
+const AutoComplete = ({ isLoading }: Props) => {
   const places = useMapsLibrary("places");
   const [inputValue, setInputValue] = useState<string>("");
   const { suggestions, resetSession } = useAutocompleteSuggestions(inputValue);
@@ -21,7 +19,7 @@ const AutoComplete = ({ onPlaceSelect, isLoading }: Props) => {
     setInputValue((event.target as HTMLInputElement).value);
   }, []);
 
-  const { error: locationError, loading, getCurrentLocation } = useGeolocation();
+  const { error: locationError, loading, getCurrentLocation, setLocation } = useGeolocation();
 
   const handleSuggestionClick = useCallback(
     async (suggestion: google.maps.places.AutocompleteSuggestion) => {
@@ -43,10 +41,10 @@ const AutoComplete = ({ onPlaceSelect, isLoading }: Props) => {
           lng: place.location.lng(),
         };
 
-        onPlaceSelect(location);
+        setLocation(location);
       }
     },
-    [places, onPlaceSelect, resetSession],
+    [places, setLocation, resetSession],
   );
 
   return (
@@ -62,8 +60,10 @@ const AutoComplete = ({ onPlaceSelect, isLoading }: Props) => {
           />
           <Button
             variant="clear"
+            text="Use current"
             icon={loading ? <LocateFixed size={16} /> : <Locate size={16} />}
             onClick={getCurrentLocation}
+            className="text-xs leading-none font-normal"
           />
         </Flexbox>
 

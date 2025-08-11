@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { ReactElement } from "react";
 import { Flexbox } from "~/styles/Flexbox";
+import { cn } from "~/utils/class-names";
 import { Spinner } from "./atoms/Spinner";
 
 export const heartStyles = "bg-white border border-black hover:bg-red-200";
@@ -18,6 +19,7 @@ interface ButtonI {
   onClick?: () => void;
   variant?: Variants;
   custom?: string; // Tailwind classes as a string
+  className?: string;
   disabled?: boolean;
 }
 
@@ -29,6 +31,7 @@ export const Button = ({
   disabled = false,
   variant = "primary",
   custom = "",
+  className = "",
   onClick,
 }: ButtonI) => {
   const base =
@@ -38,7 +41,8 @@ export const Button = ({
     primary: "bg-white border border-indigo-500 text-blue-600 hover:bg-indigo-500 hover:text-white",
     secondary:
       "bg-indigo-500 border border-transparent text-white hover:bg-white hover:text-blue-600 hover:border-indigo-500",
-    clear: "bg-white border border-gray-800 rounded-full text-gray-800 p-1 hover:bg-gray-100",
+    clear:
+      "bg-white border border-gray-800 rounded text-gray-800 p-1 hover:bg-gray-100 text-nowrap",
     link: "bg-transparent border-none text-blue-600 hover:underline px-2 py-1",
     custom: custom,
   };
@@ -46,11 +50,16 @@ export const Button = ({
   const finalClass = clsx(base, variant !== "custom" ? variants[variant] : custom);
 
   return (
-    <button type={type} onClick={onClick} disabled={disabled || loading} className={finalClass}>
+    <button
+      type={type}
+      onClick={onClick}
+      disabled={disabled || loading}
+      className={cn(finalClass, className)}
+    >
       {loading ? (
         <Spinner size={12} />
       ) : (
-        <Flexbox direction="row">
+        <Flexbox direction="row" align="items-center">
           {icon} {text}
         </Flexbox>
       )}

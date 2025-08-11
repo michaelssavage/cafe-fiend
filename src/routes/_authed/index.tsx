@@ -2,11 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Map as GoogleMap, useMap } from "@vis.gl/react-google-maps";
 import { useEffect, useState } from "react";
 import AutoComplete from "~/components/AutoComplete";
-import { DraggableAdvancedMarker } from "~/components/DraggableMarker";
+import { ClickableMarker } from "~/components/ClickableMarker";
 import { Filters } from "~/components/Filters";
 import { CafeMarker } from "~/components/Marker";
 import { useCafeFinder } from "~/hooks/use-cafe-finder.hook";
 import { useGeolocation } from "~/hooks/use-location.hook";
+import { useReverseGeocoding } from "~/hooks/use-reverse-geocode.hook";
 import { FiltersI } from "~/types/global.type";
 
 export const Route = createFileRoute("/_authed/")({
@@ -23,7 +24,8 @@ function Home() {
     options: new Set(["nearby"]),
   });
 
-  const { location, setLocation, getCurrentLocation } = useGeolocation();
+  const { location, setLocation } = useGeolocation();
+  const { cityName, loading: cityLoading } = useReverseGeocoding(location);
 
   const { data, isLoading } = useCafeFinder({
     lat: location?.lat,
@@ -32,17 +34,16 @@ function Home() {
   });
 
   useEffect(() => {
-    getCurrentLocation();
-  }, [getCurrentLocation]);
-
-  useEffect(() => {
     if (map && location) map.panTo(location);
   }, [map, location]);
 
   return (
     <div className="max-w-[900px] mx-auto px-2 pb-3">
       <h1 className="py-4">Cafe Fiend</h1>
-      <p className="pb-2 text-lg">Find your next favourite coffee</p>
+      <p className="pb-2 text-lg">
+        Find your next favourite coffee
+        {cityName && !cityLoading && <span> in {cityName}</span>}
+      </p>
 
       <Filters filters={filters} setFilters={setFilters} />
 
@@ -55,9 +56,9 @@ function Home() {
             gestureHandling="greedy"
             disableDefaultUI
           >
-            <AutoComplete onPlaceSelect={setLocation} isLoading={isLoading} />
+            <AutoComplete isLoading={isLoading} />
 
-            <DraggableAdvancedMarker position={location} setLocation={setLocation} />
+            <ClickableMarker position={location} setLocation={setLocation} />
 
             <CafeMarker userLocation={location} shops={data} />
           </GoogleMap>
