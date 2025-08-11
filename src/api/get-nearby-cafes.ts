@@ -3,7 +3,6 @@ import { FiltersServerI, FindNearbyCafesServerI, RatingEnum } from "~/types/glob
 import { fieldMask } from "~/utils/constants";
 import type { PlaceI } from "../types/place.type";
 
-const MIN_RESULTS_THRESHOLD = 10;
 const MAX_ATTEMPTS = 3;
 const RADIUS_MULTIPLIERS = [1, 1.5, 2.2];
 
@@ -21,11 +20,10 @@ const fetchCafe = async (
 
   const requestBody = {
     // https://developers.google.com/maps/documentation/places/web-service/place-types#table-a
-    textQuery: "cafe OR specialty coffee OR espresso bar OR coffeehouse",
-    includedType: "cafe",
+    textQuery: "cafe coffee",
     pageSize: 20,
     minRating: filters.rating,
-    openNow: filters.openNow,
+    ...(filters.openNow && { openNow: true }),
     rankPreference: "DISTANCE",
     locationBias: {
       circle: {
@@ -112,7 +110,7 @@ export const findNearbyCafes = createServerFn({ method: "POST" })
       rating: (data.filters?.rating
         ? parseFloat(data.filters.rating.toString())
         : 4.0) as RatingEnum,
-      openNow: data.filters?.openNow ?? false,
+      openNow: data.filters?.openNow,
     };
 
     if (filters.rating < 0 || filters.rating > 5) {
@@ -138,11 +136,9 @@ export const findNearbyCafes = createServerFn({ method: "POST" })
     try {
       const allPlaces: Array<PlaceI> = [];
       const seenPlaceIds = new Set<string>();
-      let attempts = 0;
       let currentRadius = data.filters.radius;
 
       for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-        attempts++;
         currentRadius = Math.min(data.filters.radius * RADIUS_MULTIPLIERS[attempt], 50000);
 
         console.log(`Attempt ${attempt + 1}: Searching with radius ${currentRadius}m`);
@@ -150,52 +146,33 @@ export const findNearbyCafes = createServerFn({ method: "POST" })
         const places = await fetchCafe(data.latitude, data.longitude, currentRadius, data.filters);
 
         // Add new unique places
-        const newPlaces = places.filter((place) => place.id && !seenPlaceIds.has(place.id));
-
-        newPlaces.forEach((place) => {
-          if (place.id) {
+        for (const place of places) {
+          if (place.id && !seenPlaceIds.has(place.id)) {
             seenPlaceIds.add(place.id);
             allPlaces.push(place);
           }
-        });
-
-        console.log(`Found ${newPlaces.length} new places (${allPlaces.length} total)`);
-
-        // Filter results after each fetch
-        const filteredResults = filterResults(allPlaces, data.filters, data.favorites);
-
-        console.log(`${filteredResults.length} places after filtering`);
-
-        // If we have enough results or this is the last attempt, return
-        if (filteredResults.length > MIN_RESULTS_THRESHOLD || attempt === MAX_ATTEMPTS - 1) {
-          return {
-            results: filteredResults,
-            status: "OK",
-            totalFetched: allPlaces.length,
-            finalRadius: currentRadius,
-            attempts,
-          };
         }
 
-        // Small delay between requests to be respectful to the API
+        console.log(`Found ${places.length} candidates, total so far: ${allPlaces.length}`);
+
+        // Small delay between requests
         if (attempt < MAX_ATTEMPTS - 1) {
           await new Promise((resolve) => setTimeout(resolve, 100));
         }
       }
 
-      // Fallback (shouldn't reach here, but just in case)
-      const finalResults = filterResults(allPlaces, data.filters, data.favorites);
+      const filteredResults = filterResults(allPlaces, data.filters, data.favorites);
 
       console.log("Final results", {
-        results: finalResults,
+        results: filteredResults.length,
         totalFetched: allPlaces.length,
         finalRadius: currentRadius,
-        attempts,
       });
 
       return {
-        results: finalResults,
+        results: filteredResults,
         status: "OK",
+        finalRadius: currentRadius,
       };
     } catch (error) {
       console.error("Error fetching coffee shops:", error);
