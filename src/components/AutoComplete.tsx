@@ -56,14 +56,14 @@ const AutoComplete = ({ isLoading }: Props) => {
             value={inputValue}
             onInput={(event) => handleInput(event)}
             placeholder="Search for a place..."
-            className="bg-white rounded border border-gray-800 focus:border-indigo-500 px-2 py-1 w-full"
+            className="text-xs text-gray-500 bg-white leading-none font-medium rounded border border-gray-800 focus:border-indigo-500 px-2 py-1 w-full"
           />
           <Button
             variant="clear"
             text="Use current"
             icon={loading ? <LocateFixed size={16} /> : <Locate size={16} />}
             onClick={getCurrentLocation}
-            className="text-xs leading-none font-normal"
+            className="text-xs text-gray-400 leading-none font-normal px-2"
           />
         </Flexbox>
 

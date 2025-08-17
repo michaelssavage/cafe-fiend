@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { checkSecretWord } from "~/api/check-secret-word";
 import { Button } from "~/components/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
@@ -15,12 +16,16 @@ function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
+  const [secretWord, setSecretWord] = useState("");
+
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    await checkSecretWord({ data: { secretWord } });
     const supabase = getSupabaseClient();
     setError(null);
 
@@ -91,6 +96,7 @@ function SignUp() {
                     <Input
                       id="password"
                       type="password"
+                      placeholder="******"
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -103,9 +109,21 @@ function SignUp() {
                     <Input
                       id="repeat-password"
                       type="password"
+                      placeholder="******"
                       required
                       value={repeatPassword}
                       onChange={(e) => setRepeatPassword(e.target.value)}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="secret-word">Secret Word</Label>
+                    <Input
+                      id="secret-word"
+                      type="text"
+                      placeholder="secret"
+                      required
+                      value={secretWord}
+                      onChange={(e) => setSecretWord(e.target.value)}
                     />
                   </div>
                   {error && <p className="text-sm text-red-500">{error}</p>}
